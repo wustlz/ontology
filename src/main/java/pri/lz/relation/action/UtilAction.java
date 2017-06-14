@@ -305,45 +305,6 @@ public class UtilAction {
 	}
 	
 	/**
-	 * @Title: countAtomTerm
-	 * @Description: 将各领域的原子词步长法得到的术语词汇总
-	 */
-	@Test
-	public void countAtomTerm() throws IOException{
-		
-		FileUtil fileUtil = new FileUtil();
-		
-		// 实例化InputStreamReader
-		InputStreamReader read = null;
-		BufferedReader bufferedReader = null;
-		
-		String[] dirs = {"answer", "train"};
-		
-		for (String dir : dirs) {
-			Map<String, Integer> map_term = new HashMap<>();
-			// 汇总的是原子词步长法得到的术语集合
-			List<File> listFiles = fileUtil.getAllFiles(ConstantValue.TERM_2ND_PATH+dir+"\\");
-			for (File file : listFiles) {
-				read = new InputStreamReader(new FileInputStream(file),"UTF-8");//考虑到编码格式
-				bufferedReader = new BufferedReader(read);
-				String lineTxt = null;
-				while((lineTxt = bufferedReader.readLine()) != null){
-					String[] words = lineTxt.split("\t");
-					if(words.length==2){
-						String word = words[0].trim().replaceAll("_", "");
-						int w_count = Integer.parseInt(words[1]);
-						Integer count = map_term.get(word);
-						map_term.put(word, count==null ? w_count : w_count+count);
-					}
-				}
-			}
-			// 写入txt文件
-			fileUtil.writeTxt(map_term, ConstantValue.TERM_2ND_PATH + dir + "_total_term.txt", false);
-		}
-		System.out.println("--over--");
-	}
-	
-	/**
 	* @Title: countOnlineInfo
 	* @Description: 统计术语在线比对后的术语
 	*/
