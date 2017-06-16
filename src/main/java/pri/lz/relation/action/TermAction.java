@@ -43,7 +43,7 @@ public class TermAction {
 		termAction.dealTerm();
 		
 		//3、将候选概念词集合与术语词典相比对，获取概念词集合
-		termAction.getConcepts();
+		termAction.checkTerms();
 		
 		//1、统计在线术语比对结果，分别存储到指定文件夹
 //		termAction.mergeTermOk();
@@ -55,8 +55,12 @@ public class TermAction {
 	* @Title: getConcepts
 	* @Description: 将候选概念词集合与术语词典相比对，获取概念词集合
 	*/
-	public void getConcepts(){
-		//
+	public void checkTerms(){
+		//1、加载术语词典
+		HashSet<String> online_term_ok = fileUtil.readDicUTF8(ConstantValue.ONLINE_TERM_OK);
+		HashSet<String> online_term_no = fileUtil.readDicUTF8(ConstantValue.ONLINE_TERM_NO);
+		//2、加载特征词典
+		
 	}
 	
 	/**
