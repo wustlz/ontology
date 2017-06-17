@@ -29,15 +29,16 @@ import pri.lz.relation.util.FileUtil;
 */
 public class UtilAction {
 	
+	FileUtil fileUtil = new FileUtil();
+	
 	/**
 	* @Title: findUncheckTerm
 	* @throws IOException 
-	* @Description: 筛选出未进行online check的term集合
+	* @Description: 筛选出未进行online check的term集合，必须执行的
 	*/
 	@Test
 	public void findUncheckTerm() throws IOException{
 		
-		FileUtil fileUtil = new FileUtil();
 		// 读取已经经过术语比对后的术语结果
 		HashSet<String> term_no = fileUtil.readDicUTF8(ConstantValue.ONLINE_TERM_OK);
 		HashSet<String> term_ok = fileUtil.readDicUTF8(ConstantValue.ONLINE_TERM_NO);
@@ -49,18 +50,6 @@ public class UtilAction {
 				ConstantValue.SEGMENT_PATH+"answer_total_segment.txt",
 				ConstantValue.SEGMENT_PATH + "train_total_segment.txt"
 				};
-		
-//		String[] checkpaths = {
-//				ConstantValue.DATA_ROOT_PATH+"term\\online\\wait_online_check-10.txt",
-//				ConstantValue.DATA_ROOT_PATH+"term\\online\\wait_online_check-2-1.txt",
-//				ConstantValue.DATA_ROOT_PATH+"term\\online\\wait_online_check-seg-2.txt"
-//		};
-//		// 读取对比过的术语
-//		Set<String> chectTerms = new HashSet<>();
-//		for (String checkpath : checkpaths) {
-//			chectTerms.addAll(fileUtil.readMap(checkpath));
-//		}
-//		System.out.println("chectTerms size: " + chectTerms.size());
 		
 		// 将待检测的term文件术语合并成一个文件
 		Map<String, Integer> term_map = new HashMap<>();
@@ -78,7 +67,7 @@ public class UtilAction {
 		}
 		System.out.println("term_map size: " + term_map.size());
 		
-		// 依次读取文件中的term并进行检测是否经过对比
+		// 依次读取文件中的term并进行检测是否经过对比，将对比文件按照词频分开存储
 		Map<String, Object> term_uncheck_2 = new HashMap<>();
 		Map<String, Object> term_uncheck_3 = new HashMap<>();
 		Map<String, Object> term_uncheck_4 = new HashMap<>();
@@ -95,23 +84,19 @@ public class UtilAction {
 		// 遍历term_map结合，检测
 		for (Entry<String, Integer> term : term_map.entrySet()) {
 			// 通过hashset自带的contains方法比较，速度较快，直接对比是否是同一个词，若不是，则比较是否是其中的子串
-//			if(!chectTerms.contains(term.getKey())){	//首先与已经对比过的比较，没有被对比，继续
-				if(term_ok.contains(term.getKey()) || term_no.contains(term.getKey())){	//再与term_ok、term_no对比，有，wait-false
-					wait = false;
-					count_term_ok_no++;
-				} else {	//没有，则比对子串
-					// 首先与term_ok比对
-					for (String ok_term : term_ok) {
-						if(ok_term.indexOf(term.getKey())>=0){
-							wait = false;
-							count_term_child++;
-							break;
-						}
+			if(term_ok.contains(term.getKey()) || term_no.contains(term.getKey())){	//再与term_ok、term_no对比，有，wait-false
+				wait = false;
+				count_term_ok_no++;
+			} else {	//没有，则比对子串
+				// 首先与term_ok比对
+				for (String ok_term : term_ok) {
+					if(ok_term.indexOf(term.getKey())>=0){
+						wait = false;
+						count_term_child++;
+						break;
 					}
 				}
-//			} else {
-//				count_term_check++;
-//			}
+			}
 			if(wait){
 				switch (term.getValue()) {
 				case 2:
@@ -233,7 +218,6 @@ public class UtilAction {
 	@Test
 	public void countSegment() throws IOException{
 		
-		FileUtil fileUtil = new FileUtil();
 		//1、读取停用词性集合
 		HashSet<String> stopNatures = fileUtil.readDicUTF8(ConstantValue.UTIL_PATH+"stopnature.txt");
 		//2、读取停用词集合
@@ -311,7 +295,6 @@ public class UtilAction {
 	@Test
 	public void countOnlineInfo() throws IOException{
 		String onlineInfoPath = ConstantValue.DATA_ROOT_PATH + "online\\agg_online\\";
-		FileUtil fileUtil = new FileUtil();
 		//读取指定文件夹下的所有文件
 		List<File> listFiles = fileUtil.getAllFiles(onlineInfoPath);
 		Map<String, String> map_term_ok = new HashMap<>();
@@ -392,6 +375,58 @@ public class UtilAction {
         } else {
         	return false;
         }
+	}
+	
+	// 统计在线术语比对结果，分别存储到指定文件夹
+	public void mergeTermOk() throws IOException{
+		String path = ConstantValue.DATA_ROOT_PATH + "online\\agg_online\\";
+		List<File> listFiles = fileUtil.getAllFiles(path);
+		Map<String, String> map_term_ok = new HashMap<>();
+		Map<String, String> map_term_no = new HashMap<>();
+		InputStreamReader read = null;
+		BufferedReader bufferedReader = null;
+		for (File file : listFiles) {
+			read = new InputStreamReader(new FileInputStream(file),"UTF-8");//考虑到编码格式
+			bufferedReader = new BufferedReader(read);
+			String lineTxt = null;
+			while((lineTxt = bufferedReader.readLine()) != null){
+				String[] temp = lineTxt.split("\t");
+				if(temp.length==2){
+					// 根据术语在线的统计信息判断术语
+					JSONObject jsonResult = JSONObject.parseObject(temp[1]);
+					if(jsonResult!=null && jsonResult.getString("count")!=null && !jsonResult.getString("count").equals("0")){
+						map_term_ok.put(temp[0], temp[1]);
+						if(writeMap(map_term_ok, "term_online_ok.txt", false)){
+							map_term_ok.clear();
+						}
+					} else {
+						map_term_no.put(temp[0], temp[1]);
+						if(writeMap(map_term_no, "term_online_no.txt", false)){
+							map_term_no.clear();
+						}
+					}
+				}
+			}
+			read.close();
+		}
+		writeMap(map_term_ok, "term_online_ok.txt", true);
+		writeMap(map_term_no, "term_online_no.txt", true);
+	}
+	
+	public boolean writeMap(Map<String, String> map_term, String txtName, boolean write) throws IOException{
+		if(map_term.size()>5000 || write){
+			String txt = "";
+			String txt_online = "";
+			for(Entry<String, String> term : map_term.entrySet()){
+				txt_online += term.getKey() + "\t" + term.getValue() + "\n";
+				txt += term.getKey() + "\n";
+			}
+			fileUtil.writeTxt(txt_online, ConstantValue.DATA_ROOT_PATH + "term\\" + txtName, true);
+			fileUtil.writeTxt(txt, ConstantValue.DATA_ROOT_PATH + "term\\" + txtName.replaceAll("online_", ""), true);
+			return true;
+		} else {
+			return false;
+		}
 	}
 
 }

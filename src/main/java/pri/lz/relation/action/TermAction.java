@@ -11,8 +11,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import com.alibaba.fastjson.JSONObject;
-
 import pri.lz.relation.service.TermService;
 import pri.lz.relation.service.impl.TermServiceImpl;
 import pri.lz.relation.util.ConstantValue;
@@ -56,10 +54,13 @@ public class TermAction {
 	* @Description: 将候选概念词集合与术语词典相比对，获取概念词集合
 	*/
 	public void checkTerms(){
-		//1、加载术语词典
+		//1、加载术语词典、特征词词典
 		HashSet<String> online_term_ok = fileUtil.readDicUTF8(ConstantValue.ONLINE_TERM_OK);
 		HashSet<String> online_term_no = fileUtil.readDicUTF8(ConstantValue.ONLINE_TERM_NO);
-		//2、加载特征词典
+//		HashSet<String> online_term_no = fileUtil.readDicUTF8(ConstantValue.ONLINE_TERM_NO);
+		//2、加载分词结果的合并
+		
+		//2、构造特征词典
 		
 	}
 	
@@ -145,55 +146,4 @@ public class TermAction {
 		}
 	}	
 	
-	// 统计在线术语比对结果，分别存储到指定文件夹
-	public void mergeTermOk() throws IOException{
-		String path = ConstantValue.DATA_ROOT_PATH + "online\\agg_online\\";
-		List<File> listFiles = fileUtil.getAllFiles(path);
-		Map<String, String> map_term_ok = new HashMap<>();
-		Map<String, String> map_term_no = new HashMap<>();
-		InputStreamReader read = null;
-		BufferedReader bufferedReader = null;
-		for (File file : listFiles) {
-			read = new InputStreamReader(new FileInputStream(file),"UTF-8");//考虑到编码格式
-			bufferedReader = new BufferedReader(read);
-			String lineTxt = null;
-			while((lineTxt = bufferedReader.readLine()) != null){
-				String[] temp = lineTxt.split("\t");
-				if(temp.length==2){
-					// 根据术语在线的统计信息判断术语
-					JSONObject jsonResult = JSONObject.parseObject(temp[1]);
-					if(jsonResult!=null && jsonResult.getString("count")!=null && !jsonResult.getString("count").equals("0")){
-						map_term_ok.put(temp[0], temp[1]);
-						if(writeMap(map_term_ok, "term_online_ok.txt", false)){
-							map_term_ok.clear();
-						}
-					} else {
-						map_term_no.put(temp[0], temp[1]);
-						if(writeMap(map_term_no, "term_online_no.txt", false)){
-							map_term_no.clear();
-						}
-					}
-				}
-			}
-			read.close();
-		}
-		writeMap(map_term_ok, "term_online_ok.txt", true);
-		writeMap(map_term_no, "term_online_no.txt", true);
-	}
-	
-	public boolean writeMap(Map<String, String> map_term, String txtName, boolean write) throws IOException{
-		if(map_term.size()>5000 || write){
-			String txt = "";
-			String txt_online = "";
-			for(Entry<String, String> term : map_term.entrySet()){
-				txt_online += term.getKey() + "\t" + term.getValue() + "\n";
-				txt += term.getKey() + "\n";
-			}
-			fileUtil.writeTxt(txt_online, ConstantValue.DATA_ROOT_PATH + "term\\" + txtName, true);
-			fileUtil.writeTxt(txt, ConstantValue.DATA_ROOT_PATH + "term\\" + txtName.replaceAll("online_", ""), true);
-			return true;
-		} else {
-			return false;
-		}
-	}
 }
