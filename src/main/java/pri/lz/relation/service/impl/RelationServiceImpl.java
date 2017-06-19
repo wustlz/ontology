@@ -28,8 +28,9 @@ public class RelationServiceImpl implements RelationService {
 	// 计算概念特征向量
 	@Override
 	public void featureVector(String domainName, String typeName, String conceptPath) {
+		String vector_path = ConstantValue.CONCEPT_VECTOR_PATH + typeName + "\\" + domainName;
 		// 添加文件夹
-		File file = new File(ConstantValue.CONCEPT_PATH + domainName);
+		File file = new File(vector_path);
 		if(!file.exists()){
 			file.mkdirs();
 		}
@@ -83,7 +84,7 @@ public class RelationServiceImpl implements RelationService {
 				}
 				listComputed.add(concept);
 				//写入文件
-				writeConceptVectorToTxt(conceptVector, ConstantValue.CONCEPT_PATH + domainName + "\\" + concept + ".txt");
+				writeConceptVectorToTxt(conceptVector, vector_path + "\\" + concept + ".txt");
 				System.out.println(concept + " vector compute!");
 //				listConceptVectors.add(conceptVector);
 			}
@@ -189,24 +190,16 @@ public class RelationServiceImpl implements RelationService {
 	//读取概念，不重复
 	private List<String> loadConcept(String conceptPath){
 		// 读取概念
-		List<String> listConcepts = new ArrayList<>();
-		try {
-			listConcepts = fileUtil.readTxt(conceptPath, "UTF-8");
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		HashSet<String> listConcepts = fileUtil.readMap(conceptPath);
 		HashSet<String> concepts_exist = fileUtil.readDicUTF8(ConstantValue.CONCEPT_EXIST_FILE);
-		HashSet<String> concepts_set = new HashSet<>();
 		List<String> listConcepts_unique = new ArrayList<>();
 		for (String concept : listConcepts) {
-			if(concepts_set.contains(concept) || concepts_exist.contains(concept)){
+			if(concepts_exist.contains(concept)){
 				continue;
 			} else {
-				concepts_set.add(concept);
 				listConcepts_unique.add(concept);
 			}
 		}
-		
 		return listConcepts_unique;
 	}
 

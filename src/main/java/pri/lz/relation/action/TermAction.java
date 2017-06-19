@@ -22,7 +22,8 @@ import pri.lz.relation.util.MapUtil;
 * @Description: 系统第2步，完成对原子词的处理，最终得到概念集合和特征词集合，主要过程如下：
 * 				1）对原子词集合进行术语提取，首先通过停用词性和停用词筛选，然后利用原子词步长法，初步筛选出术语集合term\\1st；
 * 				2）对初步获取的术语集合进行停用词筛选、词频筛选、去重，得到候选概念词集合term\\2nd；
-* 				3）将候选概念词集合与术语词典相比对，获取概念词集合
+* 				3）将分词结果与术语词典相比对，得到特征词典集合term\\
+* 				4）将候选概念词集合与术语词典相比对，获取概念词集合concept\\
 * @author 廖劲为
 * @date 2017年6月13日 下午8:29:20
 * 
@@ -38,13 +39,10 @@ public class TermAction {
 //		termAction.getTerm(minfrequency);
 		
 		//2、处理初步获取的术语集合，得到候选概念词集合
-		termAction.dealTerm();
+//		termAction.dealTerm();
 		
 		//3、将候选概念词集合与术语词典相比对，获取概念词集合
 		termAction.checkTerms();
-		
-		//1、统计在线术语比对结果，分别存储到指定文件夹
-//		termAction.mergeTermOk();
 		
 		System.out.println("--over--");
 	}
@@ -53,15 +51,52 @@ public class TermAction {
 	* @Title: getConcepts
 	* @Description: 将候选概念词集合与术语词典相比对，获取概念词集合
 	*/
-	public void checkTerms(){
-		//1、加载术语词典、特征词词典
+	public void checkTerms() throws IOException{
+		//1、加载术语词典
 		HashSet<String> online_term_ok = fileUtil.readDicUTF8(ConstantValue.ONLINE_TERM_OK);
-		HashSet<String> online_term_no = fileUtil.readDicUTF8(ConstantValue.ONLINE_TERM_NO);
 //		HashSet<String> online_term_no = fileUtil.readDicUTF8(ConstantValue.ONLINE_TERM_NO);
-		//2、加载分词结果的合并
+		//2、加载分词结果的合并，构造特征词典
+		HashSet<String> term_wait = fileUtil.readMap(ConstantValue.SEGMENT_PATH+"answer_total_segment.txt");
+		term_wait.addAll(fileUtil.readMap(ConstantValue.SEGMENT_PATH+"train_total_segment.txt"));
+		HashSet<String> term_dic = new HashSet<>();
+		for (String term : term_wait) {
+			if(online_term_ok.contains(term)){
+				term_dic.add(term);
+			}
+		}
+		fileUtil.writeSet2Txt(term_dic, ConstantValue.TERM_DIC_PATH, false);
+		//3、构造领域概念集合
+		// 实例化InputStreamReader
+		InputStreamReader read = null;
+		BufferedReader bufferedReader = null;
+				
+		String[] dirs = {"train","answer"};
 		
-		//2、构造特征词典
-		
+		for (String dir : dirs) {
+			System.out.println("cur dir: " + dir);
+			// 获取当前领域文件夹所有的初处理得到的术语文件
+			List<File> listFiles = fileUtil.getAllFiles(ConstantValue.TERM_2ND_PATH+dir);
+			for (File file : listFiles) {
+				String fileName = file.getName();
+				read = new InputStreamReader(new FileInputStream(file),"UTF-8");//考虑到编码格式
+				bufferedReader = new BufferedReader(read);
+				Map<String, Integer> map_term = new HashMap<>();
+				String lineTxt = null;
+				while((lineTxt = bufferedReader.readLine()) != null){
+					String[] words = lineTxt.split("\t");
+					if(words.length==2){
+						String word = words[0].trim().replaceAll("_", "");
+						if(online_term_ok.contains(word)){
+							int w_count = Integer.parseInt(words[1]);
+							Integer count = map_term.get(word);
+							map_term.put(word, count==null ? w_count : w_count+count);
+						}
+					}
+				}
+				// 写入文件
+				fileUtil.writeTxt(map_term, ConstantValue.CONCEPT_PATH+dir+"\\"+fileName, false);
+			}
+		}
 	}
 	
 	/**

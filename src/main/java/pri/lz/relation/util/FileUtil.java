@@ -262,4 +262,31 @@ public class FileUtil {
 			e.printStackTrace();
 		}
 	}
+	
+	/**
+	* @Title: writeSet2Txt
+	* @Description: 将hashset集合写入TXT文件
+	*/
+	public void writeSet2Txt(HashSet<String> set, String path, boolean append){
+		String txt = "";
+		try {
+			File file = new File(path);
+			if(!append && file.exists()){
+				FileWriter fw = new FileWriter(file);
+				fw.write("");
+				fw.close();
+			}
+			
+			for (String temp : set) {
+				txt += temp + "\n";
+				if (txt.length() > 10000) {
+					writeTxt(txt, path, true);
+					txt = "";
+				}
+			}
+			writeTxt(txt, path, true);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
 }
