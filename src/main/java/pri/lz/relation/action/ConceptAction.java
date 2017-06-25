@@ -43,7 +43,7 @@ public class ConceptAction {
 	public void countIndexMatrix(){
 		RelationService relationService = new RelationServiceImpl();
 		try {
-			relationService.countIndexMatrix("C19-Computer");
+			relationService.countIndexMatrix("train", "C19-Computer");
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

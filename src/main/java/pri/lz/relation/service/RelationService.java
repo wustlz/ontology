@@ -35,8 +35,9 @@ public interface RelationService {
 	* @Title: countIndex
 	* @Description: 统计当前领域概念包括所有特征向量不为0的特征词索引
 	* @param domainName-领域名称
+	* @param typeName-类型，train，answer
 	*/
-	public void countIndexMatrix(String domainName) throws IOException;
+	public void countIndexMatrix(String typeName, String domainName) throws IOException;
 	
 	/**
 	* @Title: trainByBP

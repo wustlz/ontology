@@ -28,10 +28,9 @@ public class ConstantValue {
 	
 	public static String TERM_DIC_PATH = DATA_ROOT_PATH + "term\\term_dic.txt";	// 经过术语在线比对，作为特征词典
 	public static String CONCEPT_PATH = DATA_ROOT_PATH + "concept\\";	//概念词集合文件夹
-	public static String CONCEPT_VECTOR_PATH = DATA_ROOT_PATH + "concept\\vector\\";	//概念向量集合文件夹
-	
-//	public static String CONCEPT_PATH = DATA_ROOT_PATH + "term\\concept\\";	//概念特征向量的文件夹
+	public static String CONCEPT_VECTOR_PATH = CONCEPT_PATH + "vector\\";	//概念向量集合文件夹
 	public static String CONCEPT_EXIST_FILE = CONCEPT_PATH + "concept_exist.txt";	// 已经计算过特征向量的概念
+	
 	public static int FEATURE_SIZE = 36839;	//向量维数
 	public static int RELATION_SIZE = 10;	//关系种类数
 	

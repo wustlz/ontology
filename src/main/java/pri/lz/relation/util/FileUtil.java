@@ -8,6 +8,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -97,6 +98,34 @@ public class FileUtil {
 				String lineTxt = null;
 				while ((lineTxt = bufferedReader.readLine()) != null) {
 					words.add(lineTxt.trim());
+				}
+				read.close();
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		return words;
+	}
+	
+	/**
+	* @Title: readMap
+	* @Description: 读取map集合写入txt文件中的第1列值，存储到hashset中
+	* @return HashSet<String>
+	*/
+	public Map<String, String> readInfo(String path){
+		Map<String, String> words = new HashMap<>();
+		try {
+			File file = new File(path);
+			if (file.isFile() && file.exists()) { // 判断文件是否存在
+				InputStreamReader read = new InputStreamReader(new FileInputStream(file), "UTF-8");// 考虑到编码格式
+				BufferedReader bufferedReader = new BufferedReader(read);
+				String lineTxt = null;
+				while ((lineTxt = bufferedReader.readLine()) != null) {
+					String[] temps = lineTxt.split("\t");
+					if(temps.length>0){
+						words.put(temps[0].trim(),temps[1].trim());
+					}
 				}
 				read.close();
 			}

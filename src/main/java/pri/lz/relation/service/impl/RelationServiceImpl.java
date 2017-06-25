@@ -264,10 +264,10 @@ public class RelationServiceImpl implements RelationService {
 
 	// 统计当前领域概念包括所有特征向量不为0的特征词索引
 	@Override
-	public void countIndexMatrix(String domainName) throws IOException {
+	public void countIndexMatrix(String typeName, String domainName) throws IOException {
 		List<String> listConcepts = new ArrayList<>();
 		// 读取指定领域的概念特征向量所在的文件夹下的所有文件
-		List<File> listFiles = fileUtil.getAllFiles(ConstantValue.CONCEPT_PATH+domainName);
+		List<File> listFiles = fileUtil.getAllFiles(ConstantValue.CONCEPT_VECTOR_PATH+typeName+"\\"+domainName);
 		// 首先统计在所有概念中都起作用的特征词索引
 		HashSet<Integer> term_indexs = new HashSet<>();
 		InputStreamReader read = null;
@@ -306,13 +306,13 @@ public class RelationServiceImpl implements RelationService {
 			}
 			read.close();
 		}
-        writeMatrix(primaryArray, ConstantValue.MATRIX_PATH+domainName+"_1_origin.txt");
+        writeMatrix(primaryArray, ConstantValue.CONCEPT_VECTOR_PATH+typeName+"\\"+domainName+"_1_origin.txt");
         // 按当前读取顺序写入概念名
         String txt = "";
         for (String concept : listConcepts) {
 			txt += concept + "\n";
 		}
-        fileUtil.writeTxt(txt, ConstantValue.MATRIX_PATH+domainName+".txt", false);
+        fileUtil.writeTxt(txt, ConstantValue.CONCEPT_VECTOR_PATH+typeName+"\\"+domainName+".txt", false);
 	}
 	
 	private void writeMatrix(double[][] matrix, String fileName) throws IOException{

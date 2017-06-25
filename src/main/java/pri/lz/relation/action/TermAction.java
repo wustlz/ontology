@@ -54,7 +54,7 @@ public class TermAction {
 	public void checkTerms() throws IOException{
 		//1、加载术语词典
 		HashSet<String> online_term_ok = fileUtil.readDicUTF8(ConstantValue.ONLINE_TERM_OK);
-//		HashSet<String> online_term_no = fileUtil.readDicUTF8(ConstantValue.ONLINE_TERM_NO);
+		Map<String, String> online_term_info = fileUtil.readInfo(ConstantValue.ONLINE_INFO_OK);
 		//2、加载分词结果的合并，构造特征词典
 		HashSet<String> term_wait = fileUtil.readMap(ConstantValue.SEGMENT_PATH+"answer_total_segment.txt");
 		term_wait.addAll(fileUtil.readMap(ConstantValue.SEGMENT_PATH+"train_total_segment.txt"));
@@ -86,7 +86,7 @@ public class TermAction {
 					String[] words = lineTxt.split("\t");
 					if(words.length==2){
 						String word = words[0].trim().replaceAll("_", "");
-						if(online_term_ok.contains(word)){
+						if(online_term_ok.contains(word) && checkDomain(word,online_term_info)){
 							int w_count = Integer.parseInt(words[1]);
 							Integer count = map_term.get(word);
 							map_term.put(word, count==null ? w_count : w_count+count);
@@ -99,6 +99,11 @@ public class TermAction {
 		}
 	}
 	
+	private boolean checkDomain(String word, Map<String, String> online_term_info) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
 	/**
 	* @Title: dealTerm
 	* @Description: 处理初步获取的术语集合，得到候选概念词集合
