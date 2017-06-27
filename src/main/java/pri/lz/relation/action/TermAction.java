@@ -11,9 +11,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
+
 import pri.lz.relation.service.TermService;
 import pri.lz.relation.service.impl.TermServiceImpl;
 import pri.lz.relation.util.ConstantValue;
+import pri.lz.relation.util.DomainConcept;
 import pri.lz.relation.util.FileUtil;
 import pri.lz.relation.util.MapUtil;
 
@@ -31,6 +35,7 @@ import pri.lz.relation.util.MapUtil;
 public class TermAction {
 	
 	FileUtil fileUtil = new FileUtil();
+	DomainConcept domainConcept = new DomainConcept();
 	public static void main(String[] args) throws IOException {
 		TermAction termAction = new TermAction();
 		
@@ -86,7 +91,7 @@ public class TermAction {
 					String[] words = lineTxt.split("\t");
 					if(words.length==2){
 						String word = words[0].trim().replaceAll("_", "");
-						if(online_term_ok.contains(word) && checkDomain(word,online_term_info)){
+						if(online_term_ok.contains(word) && checkDomain(word,fileName.replaceAll(".txt", ""), online_term_info.get(word))){
 							int w_count = Integer.parseInt(words[1]);
 							Integer count = map_term.get(word);
 							map_term.put(word, count==null ? w_count : w_count+count);
@@ -99,8 +104,19 @@ public class TermAction {
 		}
 	}
 	
-	private boolean checkDomain(String word, Map<String, String> online_term_info) {
-		// TODO Auto-generated method stub
+	private boolean checkDomain(String word, String domain, String online_info) {
+		// 根据领域对应的概念学科
+		String[] xuekes = domainConcept.getDomain_ke().get(domain).split(",");
+		// 将online_info转换为json格式
+		JSONObject jsonobjec = JSON.parseObject(online_info);
+		String[] checks = jsonobjec.get("xks").toString().split("，");
+		// 验证学科是否正确
+		for (String check_term : checks) {
+			for (String xueke : xuekes) {
+				if(xueke.equals(check_term))
+					return true;
+			}
+		}
 		return false;
 	}
 

@@ -110,7 +110,7 @@ public class FileUtil {
 	
 	/**
 	* @Title: readMap
-	* @Description: 读取map集合写入txt文件中的第1列值，存储到hashset中
+	* @Description: 读取map集合
 	* @return HashSet<String>
 	*/
 	public Map<String, String> readInfo(String path){

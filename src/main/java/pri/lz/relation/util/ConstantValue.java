@@ -66,6 +66,7 @@ public class ConstantValue {
 		DOMAINONLINE.put("C37-Military", "C37-Military");
 		DOMAINONLINE.put("C38-Politics", "C38-Politics");
 		DOMAINONLINE.put("C39-Sports", "C39-Sports");
+		
 	}
 	
 	// 根据关系名称返回对应的值
@@ -121,40 +122,5 @@ public class ConstantValue {
 		default:
 			return "other";
 		}
-	}
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
+	}	
 }
