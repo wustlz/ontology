@@ -24,7 +24,7 @@ public class ConceptAction {
 		action.conceptVector();
 		
 		// 统计指定领域的概念的特征向量矩阵
-//		action.countIndexMatrix();
+		action.countIndexMatrix();
 		
 		// 通过BP神经网络训练
 //		action.trainByBP();
@@ -36,7 +36,7 @@ public class ConceptAction {
 	// 计算概念向量
 	public void conceptVector(){
 		RelationService relationService = new RelationServiceImpl();
-		relationService.featureVector("C19-Computer", "train", ConstantValue.CONCEPT_PATH + "train\\C19-Computer.txt");
+		relationService.featureVector("C19-Computer", "train", ConstantValue.CONCEPT_PATH + "train\\C19-Computer.txt", 50);
 	}
 	
 	// 统计指定领域的概念的特征向量矩阵

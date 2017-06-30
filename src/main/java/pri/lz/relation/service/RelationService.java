@@ -17,9 +17,10 @@ public interface RelationService {
 	* @param domainName-领域名称
 	* @param typeName-类型，train，answer
 	* @param conceptPath-待计算特征向量的概念文档路径
+	* @param feautreSize-最少特征词个数
 	* @return void
 	*/
-	public void featureVector(String domainName, String typeName, String conceptPath);
+	public void featureVector(String domainName, String typeName, String conceptPath, int feautreSize);
 	
 	/**
 	* @Title: computeRelated

@@ -27,7 +27,7 @@ public class RelationServiceImpl implements RelationService {
 
 	// 计算概念特征向量
 	@Override
-	public void featureVector(String domainName, String typeName, String conceptPath) {
+	public void featureVector(String domainName, String typeName, String conceptPath, int feautreSize) {
 		String vector_path = ConstantValue.CONCEPT_VECTOR_PATH + typeName + "\\" + domainName;
 		// 添加文件夹
 		File file = new File(vector_path);
@@ -84,9 +84,13 @@ public class RelationServiceImpl implements RelationService {
 				}
 				listComputed.add(concept);
 				//写入文件
-				writeConceptVectorToTxt(conceptVector, vector_path + "\\" + concept + ".txt");
-				System.out.println(concept + " vector compute!");
-//				listConceptVectors.add(conceptVector);
+//				writeConceptVectorToTxt(conceptVector, vector_path + "\\" + concept + ".txt");
+				System.out.println(concept + "\t" + conceptVector.size());
+				if(conceptVector.size()>feautreSize){
+					writeConceptVectorToTxt(conceptVector, vector_path + "\\" + concept + ".txt");
+//					System.out.println(concept + " vector compute!");
+					//listConceptVectors.add(conceptVector);
+				}
 			}
 			// 将listComputed写入文件
 			String txt = "";
