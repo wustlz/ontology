@@ -17,6 +17,7 @@ import org.junit.Test;
 import com.alibaba.fastjson.JSONObject;
 
 import pri.lz.relation.util.ChineseCharUtil;
+import pri.lz.relation.util.ConceptRealtionUtil;
 import pri.lz.relation.util.ConstantValue;
 import pri.lz.relation.util.FileUtil;
 
@@ -30,6 +31,47 @@ import pri.lz.relation.util.FileUtil;
 public class UtilAction {
 	
 	FileUtil fileUtil = new FileUtil();
+	
+	/**
+	* @Title: loadTrainVector
+	* @Description: 根据指定的概念对加载相应的概念特征向量
+	*/
+	@Test
+	public void loadTrainVector() throws IOException{
+		ConceptRealtionUtil service = new ConceptRealtionUtil();
+		String type = "train";
+		String domainName = "C19-Computer";
+		//1、顺序读取概念
+		List<String> listConcepts = service.loadConcepts(ConstantValue.CONCEPT_VECTOR_PATH+type+"\\"+domainName+".txt");
+		//2、顺序读取概念特征向量
+		List<double[]> listConceptVector = service.loadMatrix(ConstantValue.CONCEPT_VECTOR_PATH+type+ "\\" + domainName + "_1_origin.txt");
+		
+		String train_concept = ConstantValue.RELATION_PATH+type+"\\"+"train_concept.txt";
+		List<String[]> listTrains = service.loadTrain(train_concept);
+		Set<String> set = new HashSet<>();
+		for (String[] trains : listTrains) {
+			set.add(trains[0]);
+			set.add(trains[1]);
+		}
+		int size= listConcepts.size();
+		String txt_1 = "";
+		String txt_2 = "";
+		for(int i=0;i<size;i++){
+			if(set.contains(listConcepts.get(i))){
+				txt_1 += listConcepts.get(i) + "\n";
+				for(double d : listConceptVector.get(i)){
+					txt_2 += d+"\t";
+				}
+				txt_2 += "\n";
+				if(txt_2.length()>10000){
+					fileUtil.writeTxt(txt_2, ConstantValue.RELATION_PATH+type+"\\"+domainName+"_1_origin.txt", true);
+					txt_2 = "";
+				}
+			}
+		}
+		fileUtil.writeTxt(txt_1, ConstantValue.RELATION_PATH+type+"\\"+domainName+".txt", false);
+		fileUtil.writeTxt(txt_2, ConstantValue.RELATION_PATH+type+"\\"+domainName+"_1_origin.txt", true);
+	}
 	
 	/**
 	* @Title: findUncheckTerm

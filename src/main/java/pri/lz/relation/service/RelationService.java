@@ -46,4 +46,13 @@ public interface RelationService {
 	* @param domainName-领域名称
 	*/
 	public void trainByBP(String domainName) throws IOException;
+
+	/**
+	* @Title: conceptRelated
+	* @Description: 计算概念的相关度，通过夹角余弦公式表示
+	* @param type-语料类型【train，answer】
+	* @param domainName-领域名称
+	* @param limit-阈值
+	*/
+	public void conceptRelated(String type, String domainName, double limit) throws IOException;
 }

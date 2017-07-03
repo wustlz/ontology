@@ -85,10 +85,10 @@ public class RelationServiceImpl implements RelationService {
 				listComputed.add(concept);
 				//写入文件
 //				writeConceptVectorToTxt(conceptVector, vector_path + "\\" + concept + ".txt");
-				System.out.println(concept + "\t" + conceptVector.size());
+//				System.out.println(concept + "\t" + conceptVector.size());
 				if(conceptVector.size()>feautreSize){
 					writeConceptVectorToTxt(conceptVector, vector_path + "\\" + concept + ".txt");
-//					System.out.println(concept + " vector compute!");
+					System.out.println(concept + " vector compute!");
 					//listConceptVectors.add(conceptVector);
 				}
 			}
@@ -339,11 +339,11 @@ public class RelationServiceImpl implements RelationService {
 	@Override
 	public void trainByBP(String domainName) throws IOException {
 		// 根据领域加载概念向量集合（压缩后）
-		List<double[]> listConceptVector = loadMatrix(domainName);
+		List<double[]> listConceptVector = loadMatrix(ConstantValue.MATRIX_PATH + domainName + "_2_lle.txt");
 		// 顺序读取概念名称
-		List<String> listConcepts = loadConcepts(domainName);
+		List<String> listConcepts = loadConcepts(ConstantValue.MATRIX_PATH + domainName + ".txt");
 		// 读取手工训练数据集
-		List<String[]> listTrains = loadTrain(domainName);
+		List<String[]> listTrains = loadTrain(ConstantValue.RELATION_PATH + domainName + "_train_relation.txt");
 		int train_size = listTrains.size();
 		double[][] datas = new double[train_size][];	//全部数据集
 		double[][] targets = new double[train_size][];	//对应的目标向量
@@ -439,8 +439,8 @@ public class RelationServiceImpl implements RelationService {
 	}
 	
 	// 根据领域有序加载对应的概念名词
-	private List<String[]> loadTrain(String domainName) throws IOException{
-		File file = new File(ConstantValue.RELATION_PATH + domainName + "_train_relation.txt");
+	public List<String[]> loadTrain(String fileName) throws IOException{
+		File file = new File(fileName);
 		InputStreamReader read = new InputStreamReader(new FileInputStream(file), "UTF-8");// 考虑到编码格式
 		BufferedReader bufferedReader = new BufferedReader(read);
 		
@@ -457,8 +457,8 @@ public class RelationServiceImpl implements RelationService {
 	}
 
 	// 根据领域加载概念向量集合（压缩后）
-	private List<double[]> loadMatrix(String domainName) throws IOException{
-		File file = new File(ConstantValue.MATRIX_PATH + domainName + "_2_lle.txt");
+	public List<double[]> loadMatrix(String fileName) throws IOException{
+		File file = new File(fileName);
 		InputStreamReader read = new InputStreamReader(new FileInputStream(file), "UTF-8");// 考虑到编码格式
 		BufferedReader bufferedReader = new BufferedReader(read);
 		String lineTxt = null;
@@ -479,8 +479,8 @@ public class RelationServiceImpl implements RelationService {
 	}
 
 	// 顺序读取概念名称
-	private List<String> loadConcepts(String domainName) throws IOException{
-		File file = new File(ConstantValue.MATRIX_PATH + domainName + ".txt");
+	public List<String> loadConcepts(String fileName) throws IOException{
+		File file = new File(fileName);
 		InputStreamReader read = new InputStreamReader(new FileInputStream(file), "UTF-8");// 考虑到编码格式
 		BufferedReader bufferedReader = new BufferedReader(read);
 		String lineTxt = null;
@@ -490,5 +490,83 @@ public class RelationServiceImpl implements RelationService {
 		}
 		read.close();
 		return listConcepts;
+	}
+
+	//计算概念的相关度，通过夹角余弦公式表示
+	@Override
+	public void conceptRelated(String type, String domainName, double limit) throws IOException {
+		//1、顺序读取概念
+		List<String> listConcepts = loadConcepts(ConstantValue.CONCEPT_VECTOR_PATH+type+"\\"+domainName+".txt");
+		//2、顺序读取概念特征向量
+		List<double[]> listConceptVector = loadMatrix(ConstantValue.CONCEPT_VECTOR_PATH+type+ "\\" + domainName + "_1_origin.txt");
+		
+		HashSet<String> setConcepts = new HashSet<>();
+		
+		int size = listConcepts.size();
+		String txt = "";
+		String fileName = ConstantValue.RELATION_PATH+type+"\\"+domainName+"_concept_consin.txt";
+		for(int i=0; i<size-1; i++){
+			for(int j=i+1; j<size; j++){
+				double cosin = computeCosin(listConceptVector.get(i), listConceptVector.get(j));
+				if(cosin>limit){
+					txt += listConcepts.get(i)+"\t"+listConcepts.get(j)+"\t"+cosin+"\n";
+					setConcepts.add(listConcepts.get(i));
+					setConcepts.add(listConcepts.get(j));
+					if(txt.length()>10000){
+						fileUtil.writeTxt(txt, fileName, true);	//将夹角余弦值写入TXT文件
+						txt = "";
+					}
+				}
+			}
+		}
+		fileUtil.writeTxt(txt, fileName, true);	//将夹角余弦值写入TXT文件
+		
+		//重新整理已有的概念特征向量
+		String txt_concept = "";
+		txt = "";
+		for (int i=0; i<size; i++) {
+			if(setConcepts.contains(listConcepts.get(i))){
+				txt_concept += listConcepts.get(i) + "\n";
+				for (double d : listConceptVector.get(i)) {
+					txt += "" + d +"\t";
+				}
+				txt += "\n";
+				if(txt.length()>10000){
+					fileUtil.writeTxt(txt, ConstantValue.RELATION_PATH+type+"\\"+domainName + "_2_cosin.txt", true);
+					txt = "";
+				}
+			}
+		}
+		fileUtil.writeTxt(txt_concept, ConstantValue.RELATION_PATH+type+"\\"+domainName + "_cosin.txt", true);
+		fileUtil.writeTxt(txt, ConstantValue.RELATION_PATH+type+"\\"+domainName + "_2_cosin.txt", true);
+		
+		// --------测试阈值-------------- //
+		//读取已有的概念对
+//		List<String[]> listTrains = loadTrain(ConstantValue.RELATION_PATH + "train_concept.txt");
+//		for (String[] trains : listTrains) {
+//			int index1 = listConcepts.indexOf(trains[0].trim());
+//			int index2 = listConcepts.indexOf(trains[1].trim());
+//			System.out.println(trains[0]+"\t"+trains[1]+"\t"+trains[2]+"\t"+
+//			computeCosin(listConceptVector.get(index1), listConceptVector.get(index2)));
+//		}
+		// --------初步结果 0.02-------------- //
+	}
+	
+	// 计算a,b两个向量的夹角余弦
+	private double computeCosin(double[] a, double[] b){
+		if(a.length!=b.length){
+			return 0;
+		}
+		int size = a.length;
+		double a_b = 0.0;
+		double a_a = 0.0;
+		double b_b = 0.0;
+		for (int i=0; i<size; i++) {
+			a_b += a[i]*b[i];
+			a_a += a[i]*a[i];
+			b_b += b[i]*b[i];
+		}
+		double aa_bb = Math.pow(a_a, 0.5)*Math.pow(b_b, 0.5);
+		return a_b/aa_bb;
 	}
 }
