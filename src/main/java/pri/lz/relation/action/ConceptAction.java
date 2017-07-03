@@ -35,8 +35,9 @@ public class ConceptAction {
 	
 	// 计算概念向量
 	public void conceptVector(){
+		int feauterSize = 0;
 		RelationService relationService = new RelationServiceImpl();
-		relationService.featureVector("C19-Computer", "train", ConstantValue.CONCEPT_PATH + "train\\C19-Computer.txt", 50);
+		relationService.featureVector("C19-Computer", "train", ConstantValue.CONCEPT_PATH + "train\\C19-Computer.txt", feauterSize);
 	}
 	
 	// 统计指定领域的概念的特征向量矩阵

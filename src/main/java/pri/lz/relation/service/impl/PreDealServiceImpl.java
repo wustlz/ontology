@@ -186,7 +186,7 @@ public class PreDealServiceImpl implements PreDealService {
 	// 定义接口CLibrary，继承自com.sun.jna.Library
 	public interface CLibrary extends Library {
 		// 定义并初始化接口的静态变量
-		CLibrary Instance = (CLibrary) Native.loadLibrary(ConstantValue.NLPIR+"NLPIR", CLibrary.class);
+		CLibrary Instance = (CLibrary) Native.loadLibrary(ConstantValue.NLPIR+"\\NLPIR", CLibrary.class);
 		
 		public int NLPIR_Init(String sDataPath, int encoding, String sLicenceCode);
 				

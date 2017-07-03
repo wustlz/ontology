@@ -17,7 +17,8 @@ public class DomainConcept {
 		domain_ke.put("C15-Energy", "C15-Energy");
 		domain_ke.put("C16-Electronics", "C16-Electronics");
 		domain_ke.put("C17-Communication", "C17-Communication");
-		domain_ke.put("C19-Computer", "计算机科学技术,信息科学技术");
+//		domain_ke.put("C19-Computer", "计算机科学技术,信息科学技术");
+		domain_ke.put("C19-Computer", "计算机科学技术");
 		domain_ke.put("C23-Mine", "C23-Mine");
 		domain_ke.put("C29-Transport", "C29-Transport");
 		domain_ke.put("C31-Enviornment", "C31-Enviornment");

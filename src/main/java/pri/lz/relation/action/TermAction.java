@@ -61,15 +61,15 @@ public class TermAction {
 		HashSet<String> online_term_ok = fileUtil.readDicUTF8(ConstantValue.ONLINE_TERM_OK);
 		Map<String, String> online_term_info = fileUtil.readInfo(ConstantValue.ONLINE_INFO_OK);
 		//2、加载分词结果的合并，构造特征词典
-		HashSet<String> term_wait = fileUtil.readMap(ConstantValue.SEGMENT_PATH+"answer_total_segment.txt");
-		term_wait.addAll(fileUtil.readMap(ConstantValue.SEGMENT_PATH+"train_total_segment.txt"));
-		HashSet<String> term_dic = new HashSet<>();
-		for (String term : term_wait) {
-			if(online_term_ok.contains(term)){
-				term_dic.add(term);
-			}
-		}
-		fileUtil.writeSet2Txt(term_dic, ConstantValue.TERM_DIC_PATH, false);
+//		HashSet<String> term_wait = fileUtil.readMap(ConstantValue.SEGMENT_PATH+"answer_total_segment.txt");
+//		term_wait.addAll(fileUtil.readMap(ConstantValue.SEGMENT_PATH+"train_total_segment.txt"));
+//		HashSet<String> term_dic = new HashSet<>();
+//		for (String term : term_wait) {
+//			if(online_term_ok.contains(term)){
+//				term_dic.add(term);
+//			}
+//		}
+//		fileUtil.writeSet2Txt(term_dic, ConstantValue.TERM_DIC_PATH, false);
 		//3、构造领域概念集合
 		// 实例化InputStreamReader
 		InputStreamReader read = null;
@@ -177,6 +177,11 @@ public class TermAction {
 		TermService termService = new TermServiceImpl();
 		String[] dirs = {"train","answer"};
 		for (String dir : dirs) {
+			//新建文件夹
+			File temp = new File(ConstantValue.TERM_1ST_PATH+dir);
+			if(!temp.exists()){
+				temp.mkdirs();
+			}
 			//1、删除无效原子词
 			termService.delUnuseWord(ConstantValue.SEGMENT_PATH+dir, ConstantValue.WORD_PATH+dir, stopNatures, stopWords);
 			

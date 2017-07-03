@@ -34,7 +34,7 @@ public class ConstantValue {
 	public static int FEATURE_SIZE = 36839;	//向量维数
 	public static int RELATION_SIZE = 10;	//关系种类数
 	
-	public static String NLPIR = "D:\\NLPIR\\";
+	public static String NLPIR = "D:\\NLPIR";
 	public static String UTIL_PATH = DATA_ROOT_PATH + "util\\";
 	
 	public static String RELATION_PATH = DATA_ROOT_PATH + "relation\\";	//relation，包括训练数据集

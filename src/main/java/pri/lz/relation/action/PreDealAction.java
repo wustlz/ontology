@@ -15,8 +15,6 @@ import pri.lz.relation.util.FileUtil;
 * 				1）原始语料pre_corpus的文件编码转换，全角-半角转换，得到预处理后的语料predeal\\corpus；
 * 				2）通过中科院分词工具NLPIR对corpus分词处理，得到原子词集合predeal\\segment；
 * 				3）对corpus进行切分成句处理，得到句子集合predeal\\sentence；
-* 				4）对原子词集合进行术语提取，首先通过停用词性和停用词筛选，然后利用原子词步长法，初步筛选出术语集合term\\1st；
-* 				5）对初步获取的术语集合进行停用词筛选。
 * @author 廖劲为
 * @date 2017年6月13日 下午7:55:35
 * 
@@ -34,7 +32,7 @@ public class PreDealAction {
 		long startTime = System.currentTimeMillis();
 		
 		//1、预处理语料数据
-		main.preDealCorpus(ConstantValue.CORPUS_PATH, ConstantValue.PREDEAL_PATH);
+//		main.preDealCorpus(ConstantValue.CORPUS_PATH, ConstantValue.PREDEAL_PATH);
 		
 		//2、对预处理的语料通过ICTCLAS进行分词，得到原子词集合
 		main.segment(ConstantValue.PREDEAL_PATH, ConstantValue.SEGMENT_PATH, ConstantValue.NLPIR);
