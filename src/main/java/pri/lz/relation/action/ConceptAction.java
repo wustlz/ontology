@@ -21,16 +21,16 @@ public class ConceptAction {
 		long start = System.currentTimeMillis();
 		
 		// 计算概念特征向量并写入文件
-		action.conceptVector();
+//		action.conceptVector();
 		
 		// 统计指定领域的概念的特征向量矩阵
-		action.countIndexMatrix();
+//		action.countIndexMatrix();
 		
 		// 计算概念相关度
 //		action.computeRelated();
 		
 		// 通过BP神经网络训练
-//		action.trainByBP();
+		action.trainByBP();
 		
 		long end = System.currentTimeMillis();
 		System.out.println("--end: " + (end-start) + " ms--");
@@ -38,7 +38,7 @@ public class ConceptAction {
 	
 	// 计算概念向量
 	public void conceptVector(){
-		int feauterSize = 100;
+		int feauterSize = 50;
 		RelationService relationService = new RelationServiceImpl();
 		relationService.featureVector("C19-Computer", "train", ConstantValue.CONCEPT_PATH + "train\\C19-Computer.txt", feauterSize);
 	}

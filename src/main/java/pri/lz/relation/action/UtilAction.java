@@ -42,35 +42,30 @@ public class UtilAction {
 		String type = "train";
 		String domainName = "C19-Computer";
 		//1、顺序读取概念
-		List<String> listConcepts = service.loadConcepts(ConstantValue.CONCEPT_VECTOR_PATH+type+"\\"+domainName+".txt");
+		List<String> listConcepts = service.loadConcepts(ConstantValue.CONCEPT_VECTOR_PATH+type+"\\"+domainName+"-0.txt");
 		//2、顺序读取概念特征向量
-		List<double[]> listConceptVector = service.loadMatrix(ConstantValue.CONCEPT_VECTOR_PATH+type+ "\\" + domainName + "_1_origin.txt");
+		List<double[]> listConceptVector = service.loadMatrix(ConstantValue.CONCEPT_VECTOR_PATH+type+ "\\" + domainName + "_1_origin-0.txt");
 		
-		String train_concept = ConstantValue.RELATION_PATH+type+"\\"+"train_concept.txt";
-		List<String[]> listTrains = service.loadTrain(train_concept);
-		Set<String> set = new HashSet<>();
-		for (String[] trains : listTrains) {
-			set.add(trains[0]);
-			set.add(trains[1]);
-		}
-		int size= listConcepts.size();
-		String txt_1 = "";
-		String txt_2 = "";
-		for(int i=0;i<size;i++){
-			if(set.contains(listConcepts.get(i))){
-				txt_1 += listConcepts.get(i) + "\n";
-				for(double d : listConceptVector.get(i)){
-					txt_2 += d+"\t";
-				}
-				txt_2 += "\n";
-				if(txt_2.length()>10000){
-					fileUtil.writeTxt(txt_2, ConstantValue.RELATION_PATH+type+"\\"+domainName+"_1_origin.txt", true);
-					txt_2 = "";
-				}
+		String train_concept = ConstantValue.RELATION_PATH+"test\\"+domainName+".txt";
+		
+		List<String> listTrains = service.loadConcepts(train_concept);
+		
+		String txt = "";
+		for (String train : listTrains) {
+			int index = listConcepts.indexOf(train);
+			if(index<0){
+				System.out.println(train);
+			}
+			for(double d : listConceptVector.get(index)){
+				txt += d+"\t";
+			}
+			txt += "\n";
+			if(txt.length()>10000){
+				fileUtil.writeTxt(txt, ConstantValue.RELATION_PATH+"test\\"+domainName+"_1_origin.txt", true);
+				txt = "";
 			}
 		}
-		fileUtil.writeTxt(txt_1, ConstantValue.RELATION_PATH+type+"\\"+domainName+".txt", false);
-		fileUtil.writeTxt(txt_2, ConstantValue.RELATION_PATH+type+"\\"+domainName+"_1_origin.txt", true);
+		fileUtil.writeTxt(txt, ConstantValue.RELATION_PATH+"test\\"+domainName+"_1_origin.txt", true);
 	}
 	
 	/**
