@@ -339,7 +339,7 @@ public class RelationServiceImpl implements RelationService {
 			int need = (int) Math.round((indexs[i+1]-indexs[i])*d);
 			for(int k=indexs[i]; k<indexs[i+1]; k++){
 //				System.out.println(need+", k="+k+", i="+i+", count="+count);
-				if(k-indexs[i]<need){
+				if(k-indexs[i]<need && count<train_part){
 					inputs[count] = datas[k];
 					targts[count++] = targets[k];
 				} else {
