@@ -31,7 +31,6 @@ public class ConstantValue {
 	public static String CONCEPT_VECTOR_PATH = CONCEPT_PATH + "vector\\";	//概念向量集合文件夹
 	public static String CONCEPT_EXIST_FILE = CONCEPT_PATH + "concept_exist.txt";	// 已经计算过特征向量的概念
 	
-	public static int FEATURE_SIZE = 36839;	//向量维数
 	public static int RELATION_SIZE = 10;	//关系种类数
 	
 	public static String NLPIR = "D:\\NLPIR";
@@ -39,6 +38,9 @@ public class ConstantValue {
 	
 	public static String RELATION_PATH = DATA_ROOT_PATH + "relation\\";	//relation，包括训练数据集
 	public static String MATRIX_PATH = RELATION_PATH + "matrix\\";	//矩阵存放
+	public static String MODEL_PATH = RELATION_PATH + "result\\";	//矩阵存放
+	public static String MODEL_IPTHIDWEIGHTS = RELATION_PATH + "result\\iptHidWeights.txt";	//模型1-输入隐藏层
+	public static String MODEL_HIDOPTWEIGHTS = RELATION_PATH + "result\\hidOptWeights.txt";	//模型2-隐藏输出层
 	
 	public static String LOG_PATH = "D:\\ontology\\data\\log.txt";	//日志文件存放
 	

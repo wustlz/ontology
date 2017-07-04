@@ -56,11 +56,42 @@ public class ConceptRealtionUtil {
 		String lineTxt = null;
 		while ((lineTxt = bufferedReader.readLine()) != null) {
 			String[] temp = lineTxt.split("\t");
-			if(temp.length==3){
+			if(temp.length>0){
 				listTrains.add(temp);
 			}
 		}
 		read.close();
 		return listTrains;
+	}
+
+	// 读取训练好的BP网络模型
+	public double[][] loadBPModel(String fileName) throws IOException{
+		File file = new File(fileName);
+		InputStreamReader read = new InputStreamReader(new FileInputStream(file), "UTF-8");// 考虑到编码格式
+		BufferedReader bufferedReader = new BufferedReader(read);
+		String lineTxt = null;
+		List<double[]> listMatrix = new ArrayList<>();
+		int col = 0;
+		
+		while ((lineTxt = bufferedReader.readLine()) != null) {
+			String[] conceptVector = lineTxt.split("\t");
+			col = conceptVector.length;
+			if(col>0){
+				double[] vector = new double[col];
+				for (int i=0; i<col; i++) {
+					vector[i] = Double.parseDouble(conceptVector[i]);
+				}
+				listMatrix.add(vector);
+			}
+		}
+		read.close();
+		int row = listMatrix.size();
+		double[][] model = new double[row][col];
+		for (int i=0; i<row; i++) {
+			for (int j=0; j<col; j++) {
+				model[i][j] = listMatrix.get(i)[j];
+			}
+		}
+		return model;
 	}
 }

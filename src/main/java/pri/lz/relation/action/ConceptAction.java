@@ -1,10 +1,15 @@
 package pri.lz.relation.action;
 
 import java.io.IOException;
+import java.text.DecimalFormat;
+import java.util.List;
 
 import pri.lz.relation.service.RelationService;
 import pri.lz.relation.service.impl.RelationServiceImpl;
+import pri.lz.relation.util.BP;
+import pri.lz.relation.util.ConceptRealtionUtil;
 import pri.lz.relation.util.ConstantValue;
+import pri.lz.relation.util.FileUtil;
 
 /**
 * @ClassName: ConceptAction
@@ -32,13 +37,75 @@ public class ConceptAction {
 		// 通过BP神经网络训练
 		action.trainByBP();
 		
+		// 根据BP神经网络模型对具有相关度的概念对进行关系分类
+//		action.clssifyRelation();
+		
 		long end = System.currentTimeMillis();
 		System.out.println("--end: " + (end-start) + " ms--");
 	}
 	
+	// 根据BP神经网络模型对具有相关度的概念对进行关系分类
+	public void clssifyRelation() {
+		String domainName = "C19-Computer";
+		ConceptRealtionUtil util = new ConceptRealtionUtil();
+		try {
+			// 读取候选概念关系对
+			List<String[]> listCandidateConcepts = util.loadTrain(ConstantValue.MODEL_PATH+domainName+"_test.txt");
+			// 顺序读取概念，对应概念特征向量
+			List<String> listConcepts = util.loadConcepts(ConstantValue.MODEL_PATH+domainName+".txt");
+			// 顺序读取概念特征向量
+			List<double[]> listVectors = util.loadMatrix(ConstantValue.MODEL_PATH+domainName+"_2_lle.txt");
+			System.out.println("listCandidateConcepts: " + listCandidateConcepts.size());
+			System.out.println("listConcepts: " + listConcepts.size());
+			System.out.println("listVectors: " + listVectors.size());
+			// 读取训练好的BP模型
+			double[][] iptHids = util.loadBPModel(ConstantValue.MODEL_IPTHIDWEIGHTS);
+			double[][] hidOpts = util.loadBPModel(ConstantValue.MODEL_HIDOPTWEIGHTS);
+			// 实例化训练好的BP
+			BP bp = new BP(iptHids.length-1, iptHids[0].length-1, hidOpts[0].length-1, iptHids, hidOpts);
+			for(String[] candidates : listCandidateConcepts){
+				// 输入向量
+				double[] vector1 = listVectors.get(listConcepts.indexOf(candidates[0]));
+				double[] vector2 = listVectors.get(listConcepts.indexOf(candidates[1]));
+				double[] data = new double[vector1.length+vector2.length];	//向量合并作为输入向量
+				int k=0;
+				for(double d : vector1){
+					data[k++] = d;
+				}
+				for(double d : vector2){
+					data[k++] = d;
+				}
+				// BP计算得出输出向量
+				double[] result = bp.getResult(data);
+				printBPResult(result, candidates[0], candidates[1], domainName);
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+	}
+	
+	// 输出BP测试结果
+	private void printBPResult(double[] result, String concept1, String concept2, String domainName) throws IOException{
+		double max = -Integer.MIN_VALUE;
+		int idx = -1;
+		String txt = "";
+		DecimalFormat df = new DecimalFormat("#.000000");
+		for (int i = 0; i != result.length; i++) {
+			txt += df.format(result[i]) + "\t";
+			if (result[i] > max) {
+				max = result[i];
+				idx = i;
+			}
+		}
+		String wtxt = concept1 + "\t" + concept2 + "\t" + ConstantValue.relationType(idx) + "\t" + txt + "\n";
+		FileUtil fileUtil = new FileUtil();
+		fileUtil.writeTxt(wtxt, ConstantValue.MODEL_PATH+domainName+"_result.txt", true);
+	}
+
 	// 计算概念向量
 	public void conceptVector(){
-		int feauterSize = 30;
+		int feauterSize = 50;
 		RelationService relationService = new RelationServiceImpl();
 		relationService.featureVector("C19-Computer", "train", ConstantValue.CONCEPT_PATH + "train\\C19-Computer.txt", feauterSize);
 	}

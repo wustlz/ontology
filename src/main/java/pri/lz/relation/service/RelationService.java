@@ -23,16 +23,6 @@ public interface RelationService {
 	public void featureVector(String domainName, String typeName, String conceptPath, int feautreSize);
 	
 	/**
-	* @Title: computeRelated
-	* @Description: 计算概念之间的相关性
-	* @param concept1
-	* @param concept2
-	* @param domainName
-	* @return double-概念相似度
-	*/
-	public double computeRelated(String concept1, String concept2, String domainName);
-
-	/**
 	* @Title: countIndex
 	* @Description: 统计当前领域概念包括所有特征向量不为0的特征词索引
 	* @param domainName-领域名称

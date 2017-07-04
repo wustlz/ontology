@@ -106,7 +106,30 @@ public class BP {
 		this.momentum = momentum;
 		this.limitErr = limitErr;
 	}
-
+	
+	public BP(int inputSize, int hiddenSize, int outputSize, double[][] iptHid, double[][] hidOpts) {
+		
+		input = new double[inputSize + 1];
+		hidden = new double[hiddenSize + 1];
+		output = new double[outputSize + 1];
+		target = new double[outputSize + 1];
+		
+		hidDelta = new double[hiddenSize + 1];
+		optDelta = new double[outputSize + 1];
+		
+		iptHidWeights = iptHid;
+		hidOptWeights = hidOpts;
+		
+		random = new Random(19881211);
+		
+		iptHidPrevUptWeights = new double[inputSize + 1][hiddenSize + 1];
+		hidOptPrevUptWeights = new double[hiddenSize + 1][outputSize + 1];
+		
+		this.eta = 0.25;
+		this.momentum = 0.3;
+		this.limitErr = 0.1;
+	}
+	
 	private void randomizeWeights(double[][] matrix) {
 		for (int i = 0, len = matrix.length; i != len; i++)
 			for (int j = 0, len2 = matrix[i].length; j != len2; j++) {
@@ -350,11 +373,11 @@ public class BP {
 			}
 			txt += "\n";
 			if(txt.length()>10000){
-				fileUtil.writeTxt(txt, ConstantValue.RELATION_PATH+"iptHidWeights.txt", true);
+				fileUtil.writeTxt(txt, ConstantValue.MODEL_IPTHIDWEIGHTS, true);
 				txt = "";
 			}
 		}
-		fileUtil.writeTxt(txt, ConstantValue.RELATION_PATH+"iptHidWeights.txt", true);
+		fileUtil.writeTxt(txt, ConstantValue.MODEL_IPTHIDWEIGHTS, true);
 		txt = "";
 		// 将hidOptWeights写入txt文件
 		for(double[] ds : hidOptWeights){
@@ -363,10 +386,10 @@ public class BP {
 			}
 			txt += "\n";
 			if(txt.length()>10000){
-				fileUtil.writeTxt(txt, ConstantValue.RELATION_PATH+"hidOptWeights.txt", true);
+				fileUtil.writeTxt(txt, ConstantValue.MODEL_HIDOPTWEIGHTS, true);
 				txt = "";
 			}
 		}
-		fileUtil.writeTxt(txt, ConstantValue.RELATION_PATH+"hidOptWeights.txt", true);
+		fileUtil.writeTxt(txt, ConstantValue.MODEL_HIDOPTWEIGHTS, true);
 	}
 }

@@ -207,65 +207,6 @@ public class RelationServiceImpl implements RelationService {
 		return listConcepts_unique;
 	}
 
-	//计算概念之间的相关性
-	@Override
-	public double computeRelated(String concept1, String concept2, String domainName) {
-		// 从概念特征向量文件夹读取对应的概念特征向量文件
-		List<File> listFiles = fileUtil.getAllFiles(ConstantValue.CONCEPT_PATH + domainName);
-		Map<Integer, Double> vector1 = new HashMap<>();
-		Map<Integer, Double> vector2 = new HashMap<>();
-		// 读取对应文件的概念特征向量
-		for (File file : listFiles) {
-			if(file.getName().equals(concept1+".txt")){
-				vector1 = loadVector(file, concept1);
-			} else if(file.getName().equals(concept2+".txt")){
-				vector2 = loadVector(file, concept2);
-			}
-		}
-		System.out.println("vector1: " + vector1.size());
-		System.out.println("vector2: " + vector2.size());
-		// 根据夹角余弦计算概念相似度
-		double norm1 = 0.0;	//概念1的模
-		double norm2 = 0.0;	//概念2的模
-		double cosin = 0.0;	//概念1,2的积
-		for(int i=0; i<ConstantValue.FEATURE_SIZE; i++){
-			Double c1 = vector1.get(i);
-			Double c2 = vector2.get(i);
-			if(c1!=null){
-				norm1 += c1*c1;
-			}
-			if(c2!=null){
-				norm2 += c2*c2;
-			}
-			if(c1!=null && c2!=null){
-				cosin += c1*c2;
-			}
-		}
-		
-		double similarity = cosin/(norm1*norm2);
-		return similarity;
-	}
-
-	// 读取指定文件名的概念特征向量
-	private Map<Integer, Double> loadVector(File file, String concept1) {
-		Map<Integer, Double> vector = new HashMap<>();
-		try {
-			InputStreamReader read = new InputStreamReader(new FileInputStream(file), "UTF-8");// 考虑到编码格式
-			BufferedReader bufferedReader = new BufferedReader(read);
-			String lineTxt = null;
-			while ((lineTxt = bufferedReader.readLine()) != null) {
-				String[] term = lineTxt.split("\t");
-				if(term.length==2){
-					vector.put(Integer.parseInt(term[0]), Double.parseDouble(term[1]));
-				}
-			}
-			read.close();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		return vector;
-	}
-
 	// 统计当前领域概念包括所有特征向量不为0的特征词索引
 	@Override
 	public void countIndexMatrix(String typeName, String domainName) throws IOException {
@@ -338,12 +279,12 @@ public class RelationServiceImpl implements RelationService {
 	// 利用BP训练当前领域的概念关系分类器
 	@Override
 	public void trainByBP(String domainName) throws IOException {
-		// 根据领域加载概念向量集合（压缩后）
-		List<double[]> listConceptVector = loadMatrix(ConstantValue.MATRIX_PATH + domainName + "_2_lle.txt");
+		// 根据领域加载概念向量集合
+		List<double[]> listConceptVector = loadMatrix(ConstantValue.MODEL_PATH + domainName + "_2_lle.txt");
 		// 顺序读取概念名称
-		List<String> listConcepts = loadConcepts(ConstantValue.MATRIX_PATH + domainName + ".txt");
+		List<String> listConcepts = loadConcepts(ConstantValue.MODEL_PATH + domainName + ".txt");
 		// 读取手工训练数据集
-		List<String[]> listTrains = loadTrain(ConstantValue.RELATION_PATH + domainName + "_train_relation.txt");
+		List<String[]> listTrains = loadTrain(ConstantValue.MODEL_PATH + domainName + "_train_relation.txt");
 		int train_size = listTrains.size();
 		double[][] datas = new double[train_size][];	//全部数据集
 		double[][] targets = new double[train_size][];	//对应的目标向量
@@ -379,13 +320,13 @@ public class RelationServiceImpl implements RelationService {
 			//概念关系集
 			concepts[i] = trains[0] + "\t" + trains[1];
 		}
-		/* is-a:[0-78]-79 component-of:[79-108]-30 member-of:[109-138]-30 substance-of:[139-158]-20
+		/* is-a:[0-61]-62 component-of:[79-108]-30 member-of:[109-138]-30 substance-of:[139-158]-20
 		 * cause-to:[159-171]-13 similar:[172-189]-18 opposite:[190-203]-14 attribute:[204-227]-24
 		 * TimeOrSpace:[228-249]-22 arithmetic:[250-253]-4
 		*/
-		int train_part = 120;	//注意修改
+		int train_part = 200;	//注意修改
 		double d = (double)train_part/train_size;
-		int[] indexs = {0,39,58,77,92,98,109,118,134,150,151};	//注意修改
+		int[] indexs = {0,62,102,131,156,164,182,196,217,235,238};	//注意修改
 		double[][] inputs = new double[train_part][];
 		double[][] targts = new double[train_part][];
 		double[][] inputs_test = new double[train_size-train_part][];
@@ -398,7 +339,7 @@ public class RelationServiceImpl implements RelationService {
 			int need = (int) Math.round((indexs[i+1]-indexs[i])*d);
 			for(int k=indexs[i]; k<indexs[i+1]; k++){
 //				System.out.println(need+", k="+k+", i="+i+", count="+count);
-				if(k-indexs[i]<need && count < train_part){
+				if(k-indexs[i]<need){
 					inputs[count] = datas[k];
 					targts[count++] = targets[k];
 				} else {
