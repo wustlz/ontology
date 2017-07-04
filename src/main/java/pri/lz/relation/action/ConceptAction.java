@@ -38,7 +38,7 @@ public class ConceptAction {
 	
 	// 计算概念向量
 	public void conceptVector(){
-		int feauterSize = 50;
+		int feauterSize = 30;
 		RelationService relationService = new RelationServiceImpl();
 		relationService.featureVector("C19-Computer", "train", ConstantValue.CONCEPT_PATH + "train\\C19-Computer.txt", feauterSize);
 	}

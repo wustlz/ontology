@@ -383,9 +383,9 @@ public class RelationServiceImpl implements RelationService {
 		 * cause-to:[159-171]-13 similar:[172-189]-18 opposite:[190-203]-14 attribute:[204-227]-24
 		 * TimeOrSpace:[228-249]-22 arithmetic:[250-253]-4
 		*/
-		int train_part = 200;
+		int train_part = 120;	//注意修改
 		double d = (double)train_part/train_size;
-		int[] indexs = {0,79,109,139,159,172,190,204,228,250,254};
+		int[] indexs = {0,39,58,77,92,98,109,118,134,150,151};	//注意修改
 		double[][] inputs = new double[train_part][];
 		double[][] targts = new double[train_part][];
 		double[][] inputs_test = new double[train_size-train_part][];
@@ -397,7 +397,8 @@ public class RelationServiceImpl implements RelationService {
 		for(int i=0; i<indexs.length-1; i++){
 			int need = (int) Math.round((indexs[i+1]-indexs[i])*d);
 			for(int k=indexs[i]; k<indexs[i+1]; k++){
-				if(k-indexs[i]<need){
+//				System.out.println(need+", k="+k+", i="+i+", count="+count);
+				if(k-indexs[i]<need && count < train_part){
 					inputs[count] = datas[k];
 					targts[count++] = targets[k];
 				} else {
@@ -418,6 +419,7 @@ public class RelationServiceImpl implements RelationService {
 		// 训练: 输入向量维数ipt_size，隐藏层节点数hdn_size，输出向量维数opt_size，学习率eta， 学习动量momentum， 最大误差limitErr
 		BP bp = new BP(ipt_size, hdn_size, opt_size, maxTrain, eta, momentum, limitErr);
 		bp.train(inputs, targts);
+		bp.writeModel();
 		// 检验
 		DecimalFormat df = new DecimalFormat("#.000000");
 		for (int k=0; k<inputs_test.length; k++) {

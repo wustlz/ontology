@@ -42,9 +42,9 @@ public class UtilAction {
 		String type = "train";
 		String domainName = "C19-Computer";
 		//1、顺序读取概念
-		List<String> listConcepts = service.loadConcepts(ConstantValue.CONCEPT_VECTOR_PATH+type+"\\"+domainName+"-0.txt");
-		//2、顺序读取概念特征向量
-		List<double[]> listConceptVector = service.loadMatrix(ConstantValue.CONCEPT_VECTOR_PATH+type+ "\\" + domainName + "_1_origin-0.txt");
+		List<String> listConcepts = service.loadConcepts(ConstantValue.CONCEPT_VECTOR_PATH+type+"\\"+domainName+"-4.txt");
+		//2、顺序读取降维后的概念特征向量
+		List<double[]> listConceptVector = service.loadMatrix(ConstantValue.RELATION_PATH+"test\\" + domainName + "_2_lle.txt");
 		
 		String train_concept = ConstantValue.RELATION_PATH+"test\\"+domainName+".txt";
 		
@@ -61,11 +61,11 @@ public class UtilAction {
 			}
 			txt += "\n";
 			if(txt.length()>10000){
-				fileUtil.writeTxt(txt, ConstantValue.RELATION_PATH+"test\\"+domainName+"_1_origin.txt", true);
+				fileUtil.writeTxt(txt, ConstantValue.RELATION_PATH+"test\\"+domainName+"_3_train.txt", true);
 				txt = "";
 			}
 		}
-		fileUtil.writeTxt(txt, ConstantValue.RELATION_PATH+"test\\"+domainName+"_1_origin.txt", true);
+		fileUtil.writeTxt(txt, ConstantValue.RELATION_PATH+"test\\"+domainName+"_3_train.txt", true);
 	}
 	
 	/**

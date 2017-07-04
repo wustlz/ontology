@@ -1,5 +1,6 @@
 package pri.lz.relation.util;
 
+import java.io.IOException;
 import java.util.Random;
 
 public class BP {
@@ -336,5 +337,36 @@ public class BP {
 	 */
 	private double sigmoid(double val) {
 		return 1d / (1d + Math.exp(-val));
+	}
+	
+	// 将训练好的模型写入txt文件
+	public void writeModel() throws IOException{
+		String txt = "";
+		FileUtil fileUtil = new FileUtil();
+		// 将iptHidWeights写入txt文件
+		for(double[] ds : iptHidWeights){
+			for (double d : ds) {
+				txt += d + "\t";
+			}
+			txt += "\n";
+			if(txt.length()>10000){
+				fileUtil.writeTxt(txt, ConstantValue.RELATION_PATH+"iptHidWeights.txt", true);
+				txt = "";
+			}
+		}
+		fileUtil.writeTxt(txt, ConstantValue.RELATION_PATH+"iptHidWeights.txt", true);
+		txt = "";
+		// 将hidOptWeights写入txt文件
+		for(double[] ds : hidOptWeights){
+			for (double d : ds) {
+				txt += d + "\t";
+			}
+			txt += "\n";
+			if(txt.length()>10000){
+				fileUtil.writeTxt(txt, ConstantValue.RELATION_PATH+"hidOptWeights.txt", true);
+				txt = "";
+			}
+		}
+		fileUtil.writeTxt(txt, ConstantValue.RELATION_PATH+"hidOptWeights.txt", true);
 	}
 }
