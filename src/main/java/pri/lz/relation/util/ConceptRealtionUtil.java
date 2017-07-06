@@ -6,9 +6,31 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class ConceptRealtionUtil {
+	
+	
+	/**
+	* @Title: segConcepts
+	* @Description: 拆分训练数据集
+	* @return Map<String,List<String[]>>-Key对应关系名，value对应概念对集合
+	*/
+	public Map<String, List<String[]>> segConcepts(List<String[]> listConcepts){
+		Map<String, List<String[]>> mapTrainConcepts = new HashMap<>();
+		for (String[] trains : listConcepts) {
+			List<String[]> lists = mapTrainConcepts.get(trains[2].trim());
+			if(lists==null){
+				lists = new ArrayList<>();
+			}
+			String[] concepts = {trains[0].trim(), trains[1].trim()};
+			lists.add(concepts);
+			mapTrainConcepts.put(trains[2].trim(), lists);
+		}
+		return mapTrainConcepts;
+	}
 	
 	// 根据领域加载概念向量集合（压缩后）
 	public List<double[]> loadMatrix(String fileName) throws IOException{
@@ -93,5 +115,24 @@ public class ConceptRealtionUtil {
 			}
 		}
 		return model;
+	}
+
+	/**
+	* @Title: loadInputVector
+	* @Description: 根据训练概念对的特征向量构建BP网络的输入向量
+	* @param @param listTrainConcepts——训练集中的概念对
+	* @param @param listConcepts——所有概念，有序
+	* @param @param listVectors——对应概念的特征向量，有序
+	* @param @param inputVectorSize——BP网络的输入向量维数
+	* @return Map<String,double[]>——key用概念对表示，形如：concept1_concept2，value对应当前概念对的输入向量
+	*/
+	public Map<String, double[]> loadInputVector(List<String[]> listTrainConcepts, List<String> listConcepts,
+			List<double[]> listVectors, int inputVectorSize) {
+		Map<String, double[]> inputVectors = new HashMap<>();
+		for (String[] concepts : listTrainConcepts) {
+			double[] vector1 = listVectors.get(listConcepts.indexOf(concepts[0]));	//概念1的特征向量
+			double[] vector2 = listVectors.get(listConcepts.indexOf(concepts[1]));	//概念2的特征向量
+		}
+		return null;
 	}
 }
