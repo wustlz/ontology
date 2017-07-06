@@ -132,6 +132,7 @@ public class ConceptRealtionUtil {
 		for (String[] concepts : listTrainConcepts) {
 			double[] vector1 = listVectors.get(listConcepts.indexOf(concepts[0]));	//概念1的特征向量
 			double[] vector2 = listVectors.get(listConcepts.indexOf(concepts[1]));	//概念2的特征向量
+			
 		}
 		return null;
 	}
