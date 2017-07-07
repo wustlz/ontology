@@ -129,11 +129,25 @@ public class ConceptRealtionUtil {
 	public Map<String, double[]> loadInputVector(List<String[]> listTrainConcepts, List<String> listConcepts,
 			List<double[]> listVectors, int inputVectorSize) {
 		Map<String, double[]> inputVectors = new HashMap<>();
+		
+		// 初步压缩概念对的特征向量（将同位置均为0的去除）
+		Map<String, double[][]> firstReduce = new HashMap<>();
 		for (String[] concepts : listTrainConcepts) {
 			double[] vector1 = listVectors.get(listConcepts.indexOf(concepts[0]));	//概念1的特征向量
 			double[] vector2 = listVectors.get(listConcepts.indexOf(concepts[1]));	//概念2的特征向量
-			
+			double[][] vector = new double[2][vector1.length];
+			int v_size = 0;	//合并后的非0向量为长度
+			for (int i = 0; i < vector1.length; i++) {
+				if(vector1[i]!=0 || vector2[i]!=0){
+					vector[0][v_size] = vector1[i];
+					vector[1][v_size++] = vector2[i];
+				}
+			}
 		}
+		return null;
+	}
+	
+	private double[] mergeVetor(double[][] vector){
 		return null;
 	}
 }
