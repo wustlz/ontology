@@ -392,4 +392,35 @@ public class BP {
 		}
 		fileUtil.writeTxt(txt, ConstantValue.MODEL_HIDOPTWEIGHTS, true);
 	}
+	
+	// 将训练好的模型写入txt文件，文件名按照bpName
+	public void writeModel(String bpName) throws IOException{
+		String txt = "";
+		FileUtil fileUtil = new FileUtil();
+		// 将iptHidWeights写入txt文件
+		for(double[] ds : iptHidWeights){
+			for (double d : ds) {
+				txt += d + "\t";
+			}
+			txt += "\n";
+			if(txt.length()>10000){
+				fileUtil.writeTxt(txt, ConstantValue.MODEL_PATH + bpName + "_iptHidWeights.txt", true);
+				txt = "";
+			}
+		}
+		fileUtil.writeTxt(txt, ConstantValue.MODEL_PATH + bpName + "_iptHidWeights.txt", true);
+		txt = "";
+		// 将hidOptWeights写入txt文件
+		for(double[] ds : hidOptWeights){
+			for (double d : ds) {
+				txt += d + "\t";
+			}
+			txt += "\n";
+			if(txt.length()>10000){
+				fileUtil.writeTxt(txt, ConstantValue.MODEL_PATH + bpName + "_hidOptWeights.txt", true);
+				txt = "";
+			}
+		}
+		fileUtil.writeTxt(txt, ConstantValue.MODEL_PATH + bpName + "_hidOptWeights.txt", true);
+	}
 }

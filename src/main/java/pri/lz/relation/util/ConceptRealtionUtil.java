@@ -130,24 +130,43 @@ public class ConceptRealtionUtil {
 			List<double[]> listVectors, int inputVectorSize) {
 		Map<String, double[]> inputVectors = new HashMap<>();
 		
-		// 初步压缩概念对的特征向量（将同位置均为0的去除）
-		Map<String, double[][]> firstReduce = new HashMap<>();
 		for (String[] concepts : listTrainConcepts) {
 			double[] vector1 = listVectors.get(listConcepts.indexOf(concepts[0]));	//概念1的特征向量
 			double[] vector2 = listVectors.get(listConcepts.indexOf(concepts[1]));	//概念2的特征向量
-			double[][] vector = new double[2][vector1.length];
-			int v_size = 0;	//合并后的非0向量为长度
-			for (int i = 0; i < vector1.length; i++) {
-				if(vector1[i]!=0 || vector2[i]!=0){
-					vector[0][v_size] = vector1[i];
-					vector[1][v_size++] = vector2[i];
+			inputVectors.put(concepts[0].trim()+"_"+concepts[1].trim(), mergeVetor(vector1, vector2, inputVectorSize));
+		}
+		
+		return inputVectors;
+	}
+	
+	/**
+	* @Title: mergeVetor
+	* @Description: 硬降维，取第1行的前size个最大值的索引，将对应位置的向量重新组合成2*size大小的一维向量
+	* @param vector1
+	* @param vector2
+	* @param size
+	* @return double[]
+	*/
+	private double[] mergeVetor(double[] vector1, double[] vector2, int size){
+		int leg = vector1.length;
+		for (int i=0;i<size; i++) {
+			for (int j = i+1; j < leg; j++) {
+				if(vector1[j]>vector1[i]){
+					double d = vector1[i];
+					vector1[i] = vector1[j];
+					vector1[j] = d;
+					// 同步修改对应vector[1]
+					d = vector2[i];
+					vector2[i] = vector2[j];
+					vector2[j] = d;
 				}
 			}
 		}
-		return null;
-	}
-	
-	private double[] mergeVetor(double[][] vector){
-		return null;
+		double[] iptVector = new double[size*2];
+		for(int i=0; i<size; i++){
+			iptVector[i] = vector1[i];
+			iptVector[i+size] = vector2[i];
+		}
+		return iptVector;
 	}
 }
