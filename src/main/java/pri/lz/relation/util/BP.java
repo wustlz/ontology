@@ -404,11 +404,11 @@ public class BP {
 			}
 			txt += "\n";
 			if(txt.length()>10000){
-				fileUtil.writeTxt(txt, ConstantValue.MODEL_PATH + bpName + "_iptHidWeights.txt", true);
+				fileUtil.writeTxt(txt, ConstantValue.MODEL_WEIGHT_PATH + bpName + "_iptHidWeights.txt", true);
 				txt = "";
 			}
 		}
-		fileUtil.writeTxt(txt, ConstantValue.MODEL_PATH + bpName + "_iptHidWeights.txt", true);
+		fileUtil.writeTxt(txt, ConstantValue.MODEL_WEIGHT_PATH + bpName + "_iptHidWeights.txt", true);
 		txt = "";
 		// 将hidOptWeights写入txt文件
 		for(double[] ds : hidOptWeights){
@@ -417,10 +417,10 @@ public class BP {
 			}
 			txt += "\n";
 			if(txt.length()>10000){
-				fileUtil.writeTxt(txt, ConstantValue.MODEL_PATH + bpName + "_hidOptWeights.txt", true);
+				fileUtil.writeTxt(txt, ConstantValue.MODEL_WEIGHT_PATH + bpName + "_hidOptWeights.txt", true);
 				txt = "";
 			}
 		}
-		fileUtil.writeTxt(txt, ConstantValue.MODEL_PATH + bpName + "_hidOptWeights.txt", true);
+		fileUtil.writeTxt(txt, ConstantValue.MODEL_WEIGHT_PATH + bpName + "_hidOptWeights.txt", true);
 	}
 }

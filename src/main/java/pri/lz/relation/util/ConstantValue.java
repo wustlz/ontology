@@ -39,8 +39,9 @@ public class ConstantValue {
 	public static String RELATION_PATH = DATA_ROOT_PATH + "relation\\";	//relation，包括训练数据集
 	public static String MATRIX_PATH = RELATION_PATH + "matrix\\";	//矩阵存放
 	public static String MODEL_PATH = RELATION_PATH + "result\\";	//矩阵存放
-	public static String MODEL_IPTHIDWEIGHTS = RELATION_PATH + "result\\iptHidWeights.txt";	//模型1-输入隐藏层
-	public static String MODEL_HIDOPTWEIGHTS = RELATION_PATH + "result\\hidOptWeights.txt";	//模型2-隐藏输出层
+	public static String MODEL_WEIGHT_PATH = MODEL_PATH + "weight\\";	//矩阵存放
+	public static String MODEL_IPTHIDWEIGHTS = MODEL_WEIGHT_PATH + "result\\iptHidWeights.txt";	//模型1-输入隐藏层
+	public static String MODEL_HIDOPTWEIGHTS = MODEL_WEIGHT_PATH + "result\\hidOptWeights.txt";	//模型2-隐藏输出层
 	
 	public static String LOG_PATH = "D:\\ontology\\data\\log.txt";	//日志文件存放
 	

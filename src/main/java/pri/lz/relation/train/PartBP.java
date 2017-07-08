@@ -94,6 +94,7 @@ public class PartBP {
 		double limitErr = 0.01;
 		
 		for (String relation : relations) {
+			System.out.println("当前训练BP网络：" + relation);
 			// 构建当前BP网络的输出向量
 			double[][] targts = new double[all_train_size][2];
 			tempIndex = 0;
@@ -115,7 +116,7 @@ public class PartBP {
 			BP bp = new BP(inputVectorSize*2, hdn_size, 2, maxTrain, eta, momentum, limitErr);
 			bp.train(inputs, targts);
 			bp.writeModel(relation);
-			break;	//测试使用，仅训练1次，没问题需要删除
+//			break;	//测试使用，仅训练1次，没问题需要删除
 		}
 		
 	}
