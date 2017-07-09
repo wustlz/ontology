@@ -1,6 +1,7 @@
 package pri.lz.relation.train;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -84,8 +85,6 @@ public class PartBP {
 			}
 		}
 		
-//		double[][] targts_test = new double[train_size-train_part][];
-		
 		//7、根据关系名逐次训练对应的BP网络,每个BP网络的输出为[0,1]或[1,0]
 		int hdn_size = (int) Math.round(Math.pow(inputVectorSize*2+2, 0.5)+5);	//隐藏层节点数
 		int maxTrain = 5000;
@@ -119,5 +118,41 @@ public class PartBP {
 //			break;	//测试使用，仅训练1次，没问题需要删除
 		}
 		
+		//8、根据训练好的BP网络模型，对测试组进行检测
+		//8.1、实例化BP网络模型
+		Map<String, BP> BPmodels = loadBPModels(relations, inputVectorSize*2, hdn_size, 2);
+		for (String relation : relations) {
+			for(Entry<String, List<String[]>> trains : mapTests.entrySet()){
+				for (String[] concepts : trains.getValue()) {
+					
+					Map<String, double[]> mapBPRst = BPResult(null, BPmodels);
+				}
+			}
+		}
+	}
+	
+	//根据BP网络模型输出概念对的实际关系向量
+	public Map<String, double[]> BPResult(double[] ipts, Map<String, BP> mapBPs){
+		Map<String, double[]> mapRst = new HashMap<>();
+		for(Entry<String, BP> bps : mapBPs.entrySet()){
+			double[] rst = bps.getValue().getResult(ipts);
+			mapRst.put(bps.getKey(), rst);
+		}
+		return mapRst;
+	}
+	
+	//根据关系名relation实例化BP模型
+	public Map<String, BP> loadBPModels(Set<String> relations, int iptSize, int hidSize, int optSize) throws IOException{
+		Map<String, BP> mapBPs = new HashMap<>();
+		for (String relation : relations) {
+			//1、读取训练好的BP模型
+			double[][] iptHids = conceptUtil.loadBPModel(ConstantValue.MODEL_WEIGHT_PATH+relation+"_iptHidWeights.txt");
+			double[][] hidOpts = conceptUtil.loadBPModel(ConstantValue.MODEL_WEIGHT_PATH+relation+"_hidOptWeights.txt");
+			//2、实例化训练好的BP网络模型
+			BP bp = new BP(iptSize, hidSize, optSize, iptHids, hidOpts);
+			//3、添加到list集合中去
+			mapBPs.put(relation, bp);
+		}
+		return mapBPs;
 	}
 }
