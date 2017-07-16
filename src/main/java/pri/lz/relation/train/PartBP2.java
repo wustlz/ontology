@@ -17,24 +17,24 @@ import pri.lz.relation.util.FileUtil;
 
 /**
 * @ClassName: PartBP
-* @Description: 按照关系名训练多个二元输出神经网络，概念向量的降维通过lle方法
+* @Description: 按照关系名训练多个二元输出神经网络，不压缩向量
 * @author 廖劲为
 * @date 2017年7月5日 下午8:11:27
 * 
 */
-public class PartBPByLLe {
+public class PartBP2 {
 	
 	FileUtil fileUtil = new FileUtil();
 	ConceptRealtionUtil conceptUtil = new ConceptRealtionUtil();
 	
 	public static void main(String[] args) {
 		System.out.println("---start----");
-		PartBPByLLe partBP = new PartBPByLLe();
+		PartBP2 partBP = new PartBP2();
 		try {
 			//训练神经网络
-			partBP.train();
+//			partBP.train();
 			// 应用到数据集
-//			partBP.relation();
+			partBP.relation();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -44,7 +44,6 @@ public class PartBPByLLe {
 	// 训练BP网络
 	public void train() throws IOException{
 		double train_scale = 0.8;	//训练数据集比例占总训练数据的比例
-		int inputVectorSize = 200;
 		//1、读取训练数据集
 		List<String[]> listTrainConcepts = conceptUtil.loadTrain(ConstantValue.MODEL_PATH+"C19-Computer_train_relation.txt");
 		//2、按关系名拆分成map集合，key-关系名，value-对应关系的概念对集合
@@ -52,7 +51,7 @@ public class PartBPByLLe {
 		//3、顺序读取概念，对应概念特征向量
 		List<String> listConcepts = conceptUtil.loadConcepts(ConstantValue.MODEL_PATH+"C19-Computer.txt");
 		//4、顺序读取概念特征向量
-		List<double[]> listVectors = conceptUtil.loadMatrix(ConstantValue.MODEL_PATH+"C19-Computer_2_lle.txt");
+		List<double[]> listVectors = conceptUtil.loadMatrix(ConstantValue.MODEL_PATH+"C19-Computer_1_origin.txt");
 		//5、构建输入向量，key-概念对(concept1_concept2)，value-概念对的合并向量，用作输入向量
 		Map<String, double[]> mapInputVectors = conceptUtil.loadInputVector(listTrainConcepts, listConcepts, listVectors);
 		
@@ -83,17 +82,24 @@ public class PartBPByLLe {
 			}
 		}
 		
+		int inputVectorSize = inputs[0].length/2;	//BP网络输入向量
+		
 		//7、根据关系名逐次训练对应的BP网络,每个BP网络的输出为[0,1]或[1,0]
 		int hdn_size = (int) Math.round(Math.pow(inputVectorSize*2+2, 0.5)+5);	//隐藏层节点数
-		int maxTrain = 5000;
+		int maxTrain = 500;
 		double eta = 0.25;
 		double momentum = 0.3;
 		double limitErr = 0.01;
 		
 		for (String relation : relations) {
+			System.out.println(relation);
+		}
+		
+		for (String relation : relations) {
 			System.out.println("当前训练BP网络：" + relation);
-			if(relation.equals("similar") || relation.equals("other") || relation.equals("oppsite")
-				|| relation.equals("cause-to") || relation.equals("TimeOrSpace") || relation.equals("arithmetic")){
+			if(relation.equals("similar") || relation .equals("other") || relation.equals("cause-to")
+				|| relation.equals("TimeOrSpace") || relation.equals("is-a") || relation.equals("part-of")
+				|| relation.equals("attribute")){
 				continue;
 			}
 			// 构建当前BP网络的输出向量
@@ -137,24 +143,24 @@ public class PartBPByLLe {
 	public void relation() throws IOException{
 		Set<String> relations = new HashSet<>();
 		relations.add("similar");
-		relations.add("member-of");
+//		relations.add("member-of");
 		relations.add("cause-to");
-		relations.add("component-of");
+//		relations.add("component-of");
 		relations.add("TimeOrSpace");
-		relations.add("arithmetic");
-		relations.add("opposite");
+//		relations.add("arithmetic");
+//		relations.add("opposite");
 		relations.add("attribute");
-		relations.add("substance-of");
+//		relations.add("substance-of");
+		relations.add("part-of");
 		relations.add("is-a");
-		int inputVectorSize = 200;	//BP网络输入向量的维数/2
 		//1、读取训练数据集
 		List<String[]> listTrainConcepts = conceptUtil.loadTrain(ConstantValue.MODEL_PATH+"C19-Computer_test.txt");
 		//3、顺序读取概念，对应概念特征向量
 		List<String> listConcepts = conceptUtil.loadConcepts(ConstantValue.MODEL_PATH+"C19-Computer.txt");
 		//4、顺序读取概念特征向量
-		List<double[]> listVectors = conceptUtil.loadMatrix(ConstantValue.MODEL_PATH+"C19-Computer_2_lle.txt");
+		List<double[]> listVectors = conceptUtil.loadMatrix(ConstantValue.MODEL_PATH+"C19-Computer_1_origin.txt");
 		//5、构建输入向量，key-概念对(concept1_concept2)，value-概念对的合并向量，用作输入向量
-		Map<String, double[]> mapInputVectors = conceptUtil.loadInputVector(listTrainConcepts, listConcepts, listVectors, inputVectorSize);
+		Map<String, double[]> mapInputVectors = conceptUtil.loadInputVector(listTrainConcepts, listConcepts, listVectors);
 		//6、加载BP模型
 		Map<String, BP> BPmodels = loadBPModels(relations);
 		//8.2、遍历测试
