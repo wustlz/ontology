@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public class ConceptRealtionUtil {
 	
@@ -278,5 +279,20 @@ public class ConceptRealtionUtil {
 			iptVector[i+vector1.length] = vector2[i];
 		}
 		return iptVector;
+	}
+	
+	//根据关系名relation实例化BP模型
+	public Map<String, BP> loadBPModels(Set<String> relations) throws IOException{
+		Map<String, BP> mapBPs = new HashMap<>();
+		for (String relation : relations) {
+			//1、读取训练好的BP模型
+			double[][] iptHids = loadBPModel(ConstantValue.MODEL_WEIGHT_PATH+relation+"_iptHidWeights.txt");
+			double[][] hidOpts = loadBPModel(ConstantValue.MODEL_WEIGHT_PATH+relation+"_hidOptWeights.txt");
+			//2、实例化训练好的BP网络模型
+			BP bp = new BP(iptHids.length-1, iptHids[0].length-1, hidOpts[0].length-1, iptHids, hidOpts);
+			//3、添加到list集合中去
+			mapBPs.put(relation, bp);
+		}
+		return mapBPs;
 	}
 }

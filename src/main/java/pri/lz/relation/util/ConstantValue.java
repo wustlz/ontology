@@ -40,8 +40,8 @@ public class ConstantValue {
 	public static String MATRIX_PATH = RELATION_PATH + "matrix\\";	//矩阵存放
 	public static String MODEL_PATH = RELATION_PATH + "result\\";	//矩阵存放
 	public static String MODEL_WEIGHT_PATH = MODEL_PATH + "weight\\";	//矩阵存放
-	public static String MODEL_IPTHIDWEIGHTS = MODEL_WEIGHT_PATH + "result\\iptHidWeights.txt";	//模型1-输入隐藏层
-	public static String MODEL_HIDOPTWEIGHTS = MODEL_WEIGHT_PATH + "result\\hidOptWeights.txt";	//模型2-隐藏输出层
+	public static String MODEL_IPTHIDWEIGHTS = MODEL_WEIGHT_PATH + "iptHidWeights.txt";	//模型1-输入隐藏层
+	public static String MODEL_HIDOPTWEIGHTS = MODEL_WEIGHT_PATH + "hidOptWeights.txt";	//模型2-隐藏输出层
 	
 	public static String LOG_PATH = "D:\\ontology\\data\\log.txt";	//日志文件存放
 	
@@ -77,26 +77,25 @@ public class ConstantValue {
 		switch (relationType) {
 		case "is-a":
 			return 0;
-		case "component-of":
+		case "part-of":
+//		case "component-of":
+//		case "member-of":
+//		case "substance-of":
 			return 1;
-		case "member-of":
-			return 2;
-		case "substance-of":
-			return 3;
 		case "cause-to":
-			return 4;
+			return 2;
 		case "similar":
-			return 5;
+			return 3;
 		case "opposite":
-			return 6;
+			return 4;
 		case "attribute":
-			return 7;
+			return 5;
 		case "TimeOrSpace":
-			return 8;
+			return 6;
 		case "arithmetic":
-			return 9;
+			return 7;
 		default:
-			return 10;
+			return 8;
 		}
 	}
 	
@@ -105,22 +104,21 @@ public class ConstantValue {
 		case 0:
 			return "is-a";
 		case 1:
-			return "component-of";
+			return "part-of";
+//			return "component-of";
+//			return "member-of";
+//			return "substance-of";
 		case 2:
-			return "member-of";
-		case 3:
-			return "substance-of";
-		case 4:
 			return "cause-to";
-		case 5:
+		case 3:
 			return "similar";
-		case 6:
+		case 4:
 			return "opposite";
-		case 7:
+		case 5:
 			return "attribute";
-		case 8:
+		case 6:
 			return "TimeOrSpace";
-		case 9:
+		case 7:
 			return "arithmetic";
 		default:
 			return "other";
