@@ -35,7 +35,7 @@ public class WholeBP {
 		action.train();
 		
 		// 根据BP神经网络模型对具有相关度的概念对进行关系分类
-//		action.clssifyRelation();
+		action.clssifyRelation();
 		
 		long end = System.currentTimeMillis();
 		System.out.println("--end: " + (end-start) + " ms--");
@@ -144,7 +144,7 @@ public class WholeBP {
 		
 		//7、构建BP网络模型,每个BP网络的输出为[0,0,0,...1,0](relations.size 大小)
 		int hdn_size = (int) Math.round(Math.pow(inputVectorSize*2+relations.size(), 0.5)+5);	//隐藏层节点数
-		int maxTrain = 10000;
+		int maxTrain = 100000;
 		double eta = 0.25;
 		double momentum = 0.3;
 		double limitErr = 0.01;

@@ -85,15 +85,17 @@ public class PartBPByLLe {
 		
 		//7、根据关系名逐次训练对应的BP网络,每个BP网络的输出为[0,1]或[1,0]
 		int hdn_size = (int) Math.round(Math.pow(inputVectorSize*2+2, 0.5)+5);	//隐藏层节点数
-		int maxTrain = 5000;
+		int maxTrain = 100000;
 		double eta = 0.25;
 		double momentum = 0.3;
 		double limitErr = 0.01;
 		
 		for (String relation : relations) {
 			System.out.println("当前训练BP网络：" + relation);
-			if(relation.equals("similar") || relation.equals("other") || relation.equals("oppsite")
-				|| relation.equals("cause-to") || relation.equals("TimeOrSpace") || relation.equals("arithmetic")){
+			if(relation.equals("similar") || relation.equals("cause-to") 
+				|| relation.equals("TimeOrSpace") || relation.equals("arithmetic")
+				|| relation.equals("part-of") || relation.equals("attribute")
+				|| relation.equals("is-a") ){
 				continue;
 			}
 			// 构建当前BP网络的输出向量
@@ -137,14 +139,15 @@ public class PartBPByLLe {
 	public void relation() throws IOException{
 		Set<String> relations = new HashSet<>();
 		relations.add("similar");
-		relations.add("member-of");
+//		relations.add("component-of");
+//		relations.add("member-of");
+//		relations.add("substance-of");
+		relations.add("part-of");
 		relations.add("cause-to");
-		relations.add("component-of");
 		relations.add("TimeOrSpace");
 		relations.add("arithmetic");
 		relations.add("opposite");
 		relations.add("attribute");
-		relations.add("substance-of");
 		relations.add("is-a");
 		int inputVectorSize = 200;	//BP网络输入向量的维数/2
 		//1、读取训练数据集
