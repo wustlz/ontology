@@ -107,7 +107,7 @@ public class ConceptAction {
 	public void conceptVector(){
 		int feauterSize = 50;
 		RelationService relationService = new RelationServiceImpl();
-		relationService.featureVector("C19-Computer", "train", ConstantValue.CONCEPT_PATH + "train\\C19-Computer.txt", feauterSize);
+		relationService.featureVector("C19-Computer", "train", ConstantValue.CONCEPT_PATH + "train/C19-Computer.txt", feauterSize);
 	}
 	
 	// 统计指定领域的概念的特征向量矩阵

@@ -1,6 +1,10 @@
 package util;
 
+import java.io.File;
+
 import org.junit.Test;
+
+import pri.lz.relation.util.ConstantValue;
 
 public class OrderTest {
 
@@ -31,5 +35,17 @@ public class OrderTest {
 			System.out.print(i + " , ");
 		}
 		System.out.println();
+	}
+	
+	@Test
+	public void testRootpath() {
+		String rootpath = System.getProperty("user.dir");
+		System.out.println(rootpath);
+		rootpath = ConstantValue.RELATION_PATH;
+		System.out.println(rootpath);
+		File file = new File(rootpath);
+		if(file.isDirectory()) {
+			System.out.println("true");
+		}
 	}
 }

@@ -6,7 +6,7 @@ import java.util.Map;
 public class DomainConcept {
 //	public Map<String, String> DOMAINONLINE = new HashMap<>();
 	public Map<String, String> domain_ke = new HashMap<>();
-
+	
 	public Map<String, String> getDomain_ke() {
 		domain_ke.put("C3-Art", "C3-Art");
 		domain_ke.put("C4-Literature", "C4-Literature");

@@ -24,10 +24,10 @@ import pri.lz.relation.util.MapUtil;
 /**
 * @ClassName: TermAction
 * @Description: 系统第2步，完成对原子词的处理，最终得到概念集合和特征词集合，主要过程如下：
-* 				1）对原子词集合进行术语提取，首先通过停用词性和停用词筛选，然后利用原子词步长法，初步筛选出术语集合term\\1st；
-* 				2）对初步获取的术语集合进行停用词筛选、词频筛选、去重，得到候选概念词集合term\\2nd；
-* 				3）将分词结果与术语词典相比对，得到特征词典集合term\\
-* 				4）将候选概念词集合与术语词典相比对，获取概念词集合concept\\
+* 				1）对原子词集合进行术语提取，首先通过停用词性和停用词筛选，然后利用原子词步长法，初步筛选出术语集合term/1st；
+* 				2）对初步获取的术语集合进行停用词筛选、词频筛选、去重，得到候选概念词集合term/2nd；
+* 				3）将分词结果与术语词典相比对，得到特征词典集合term/
+* 				4）将候选概念词集合与术语词典相比对，获取概念词集合concept/
 * @author 廖劲为
 * @date 2017年6月13日 下午8:29:20
 * 
@@ -99,7 +99,7 @@ public class TermAction {
 					}
 				}
 				// 写入文件
-				fileUtil.writeTxt(map_term, ConstantValue.CONCEPT_PATH+dir+"\\"+fileName, false);
+				fileUtil.writeTxt(map_term, ConstantValue.CONCEPT_PATH+dir+"/"+fileName, false);
 			}
 		}
 	}
@@ -134,7 +134,7 @@ public class TermAction {
 			// 获取当前领域文件夹所有的初处理得到的术语文件
 			List<File> listFiles = fileUtil.getAllFiles(ConstantValue.TERM_1ST_PATH+dir);
 			for (File file : listFiles) {
-				termService.dealTerm(file.getPath(), ConstantValue.TERM_2ND_PATH+dir+"\\"+file.getName(), stopwords);
+				termService.dealTerm(file.getPath(), ConstantValue.TERM_2ND_PATH+dir+"/"+file.getName(), stopwords);
 			}
 		}
 		// 将所有语料中的各个领域的候选概念词汇总
@@ -143,7 +143,7 @@ public class TermAction {
 		BufferedReader bufferedReader = null;
 		for (String dir : dirs) {
 			Map<String, Integer> map_term = new HashMap<>();
-			List<File> listFiles = fileUtil.getAllFiles(ConstantValue.TERM_2ND_PATH+dir+"\\");
+			List<File> listFiles = fileUtil.getAllFiles(ConstantValue.TERM_2ND_PATH+dir+"/");
 			for (File file : listFiles) {
 				read = new InputStreamReader(new FileInputStream(file),"UTF-8");//考虑到编码格式
 				bufferedReader = new BufferedReader(read);
@@ -189,8 +189,8 @@ public class TermAction {
 			List<File> listDomains = fileUtil.getAllFileDirs(ConstantValue.WORD_PATH+dir);
 			for (File domain : listDomains) {
 				//2、根据原子词步长法获取相应术语集合
-				Map<String, Integer> terms = termService.atomTerm(ConstantValue.WORD_PATH+dir+"\\"+domain.getName(),	//有效原子词文件夹路径
-						ConstantValue.PREDEAL_PATH+dir+"\\"+domain.getName(),	//语料库预处理后的路径
+				Map<String, Integer> terms = termService.atomTerm(ConstantValue.WORD_PATH+dir+"/"+domain.getName(),	//有效原子词文件夹路径
+						ConstantValue.PREDEAL_PATH+dir+"/"+domain.getName(),	//语料库预处理后的路径
 						minfrequency);	//阈值
 				System.out.println(terms.size());
 				//3、将term map集合按频率降序排列
@@ -201,7 +201,7 @@ public class TermAction {
 				for(Entry<String, Integer> term : termsOrderDesc.entrySet()){
 					txt += term.getKey() + "\t" + term.getValue() + "\n";
 				}
-				fileUtil.writeTxt(txt, ConstantValue.TERM_1ST_PATH+dir+"\\"+domain.getName()+".txt", false);
+				fileUtil.writeTxt(txt, ConstantValue.TERM_1ST_PATH+dir+"/"+domain.getName()+".txt", false);
 			}
 			
 		}

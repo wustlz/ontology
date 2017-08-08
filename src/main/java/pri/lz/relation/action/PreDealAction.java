@@ -12,9 +12,9 @@ import pri.lz.relation.util.FileUtil;
 /**
 * @ClassName: PreDealAction
 * @Description: 系统第1步，完成对语料库的预处理，最终得到原子词集合，主要过程如下：
-* 				1）原始语料pre_corpus的文件编码转换，全角-半角转换，得到预处理后的语料predeal\\corpus；
-* 				2）通过中科院分词工具NLPIR对corpus分词处理，得到原子词集合predeal\\segment；
-* 				3）对corpus进行切分成句处理，得到句子集合predeal\\sentence；
+* 				1）原始语料pre_corpus的文件编码转换，全角-半角转换，得到预处理后的语料predeal/corpus；
+* 				2）通过中科院分词工具NLPIR对corpus分词处理，得到原子词集合predeal/segment；
+* 				3）对corpus进行切分成句处理，得到句子集合predeal/sentence；
 * @author 廖劲为
 * @date 2017年6月13日 下午7:55:35
 * 
@@ -56,10 +56,10 @@ public class PreDealAction {
 		String[] dirs = {"train","answer"};
 		for (String dir : dirs) {
 			//1、根据语料库路径读取所有领域语料文件夹
-			List<File> listFileDirs = fileUtil.getAllFileDirs(corpusDir+dir+"\\");
+			List<File> listFileDirs = fileUtil.getAllFileDirs(corpusDir+dir+"/");
 			//2、遍历所有文件夹，进行分词
 			for (File fileDir : listFileDirs) {
-				preDealService.seg2TXTByICTCLAS(fileDir.getPath(), resultDir+dir+"\\"+fileDir.getName(), NLPIR);
+				preDealService.seg2TXTByICTCLAS(fileDir.getPath(), resultDir+dir+"/"+fileDir.getName(), NLPIR);
 			}
 		}
 	}
@@ -73,12 +73,12 @@ public class PreDealAction {
 		String[] dirs = {"train","answer"};
 		for (String dir : dirs) {
 			//1、根据语料库路径读取所有领域语料文件
-			List<File> listFileDirs = fileUtil.getAllFileDirs(corpusDir+dir+"\\");
+			List<File> listFileDirs = fileUtil.getAllFileDirs(corpusDir+dir+"/");
 			//2、遍历所有文件夹，进行预处理
 			for (File fileDir : listFileDirs) {
 				List<File> listFiles = fileUtil.getAllFiles(fileDir.getPath());
 				//2、切分成句并写入到文件
-				preDealService.txt2sentence(listFiles, ConstantValue.SENTENCE_PATH + dir + "\\" + fileDir.getName());
+				preDealService.txt2sentence(listFiles, ConstantValue.SENTENCE_PATH + dir + "/" + fileDir.getName());
 			}
 		}
 	}
@@ -94,7 +94,7 @@ public class PreDealAction {
 		String[] dirs = {"train","answer"};
 		for (String dir : dirs) {
 			//1、根据语料库路径读取所有领域语料文件
-			List<File> listFileDirs = fileUtil.getAllFileDirs(corpusDir+dir+"\\");
+			List<File> listFileDirs = fileUtil.getAllFileDirs(corpusDir+dir+"/");
 			//2、遍历所有文件夹，进行预处理
 			for (File fileDir : listFileDirs) {
 				List<File> listFiles = fileUtil.getAllFiles(fileDir.getPath());
@@ -102,7 +102,7 @@ public class PreDealAction {
 					//2.1、以GBK编码读取当前文件内容
 					String txt = fileUtil.readTxt(file,"GBK");
 					//2.2、按照预处理规则进行预处理转换，全角改半角，编码改UTF-8，并重新写入txt文件
-					preDealService.writeTxtUTF8(txt, predealDir+dir+"\\"+fileDir.getName()+"\\", file.getName(), false);
+					preDealService.writeTxtUTF8(txt, predealDir+dir+"/"+fileDir.getName()+"/", file.getName(), false);
 				}
 			}
 		}

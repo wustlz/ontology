@@ -42,11 +42,11 @@ public class UtilAction {
 		String type = "train";
 		String domainName = "C19-Computer";
 		//1、顺序读取概念
-		List<String> listConcepts = service.loadConcepts(ConstantValue.CONCEPT_VECTOR_PATH+type+"\\"+domainName+"-4.txt");
+		List<String> listConcepts = service.loadConcepts(ConstantValue.CONCEPT_VECTOR_PATH+type+"/"+domainName+"-4.txt");
 		//2、顺序读取降维后的概念特征向量
-		List<double[]> listConceptVector = service.loadMatrix(ConstantValue.RELATION_PATH+"test\\" + domainName + "_2_lle.txt");
+		List<double[]> listConceptVector = service.loadMatrix(ConstantValue.RELATION_PATH+"test/" + domainName + "_2_lle.txt");
 		
-		String train_concept = ConstantValue.RELATION_PATH+"test\\"+domainName+".txt";
+		String train_concept = ConstantValue.RELATION_PATH+"test/"+domainName+".txt";
 		
 		List<String> listTrains = service.loadConcepts(train_concept);
 		
@@ -61,11 +61,11 @@ public class UtilAction {
 			}
 			txt += "\n";
 			if(txt.length()>10000){
-				fileUtil.writeTxt(txt, ConstantValue.RELATION_PATH+"test\\"+domainName+"_3_train.txt", true);
+				fileUtil.writeTxt(txt, ConstantValue.RELATION_PATH+"test/"+domainName+"_3_train.txt", true);
 				txt = "";
 			}
 		}
-		fileUtil.writeTxt(txt, ConstantValue.RELATION_PATH+"test\\"+domainName+"_3_train.txt", true);
+		fileUtil.writeTxt(txt, ConstantValue.RELATION_PATH+"test/"+domainName+"_3_train.txt", true);
 	}
 	
 	/**
@@ -140,7 +140,7 @@ public class UtilAction {
 					term_uncheck_2.put(term.getKey(), term.getValue());
 					if(term_uncheck_2.size()>10000){
 						// 写入txt文件
-						fileUtil.writeMap2Txt(term_uncheck_2, ConstantValue.DATA_ROOT_PATH+"term\\online\\wait_online_check-2.txt", true);
+						fileUtil.writeMap2Txt(term_uncheck_2, ConstantValue.DATA_ROOT_PATH+"term/online/wait_online_check-2.txt", true);
 						term_uncheck_2.clear();
 						System.out.println("--term_uncheck_2 write--");
 					}
@@ -149,7 +149,7 @@ public class UtilAction {
 					term_uncheck_3.put(term.getKey(), term.getValue());
 					if(term_uncheck_3.size()>5000){
 						// 写入txt文件
-						fileUtil.writeMap2Txt(term_uncheck_3, ConstantValue.DATA_ROOT_PATH+"term\\online\\wait_online_check-3.txt", true);
+						fileUtil.writeMap2Txt(term_uncheck_3, ConstantValue.DATA_ROOT_PATH+"term/online/wait_online_check-3.txt", true);
 						term_uncheck_3.clear();
 						System.out.println("--term_uncheck_3 write--");
 					}
@@ -158,7 +158,7 @@ public class UtilAction {
 					term_uncheck_4.put(term.getKey(), term.getValue());
 					if(term_uncheck_4.size()>5000){
 						// 写入txt文件
-						fileUtil.writeMap2Txt(term_uncheck_4, ConstantValue.DATA_ROOT_PATH+"term\\online\\wait_online_check-4.txt", true);
+						fileUtil.writeMap2Txt(term_uncheck_4, ConstantValue.DATA_ROOT_PATH+"term/online/wait_online_check-4.txt", true);
 						term_uncheck_4.clear();
 						System.out.println("--term_uncheck_4 write--");
 					}
@@ -167,7 +167,7 @@ public class UtilAction {
 					term_uncheck_5.put(term.getKey(), term.getValue());
 					if(term_uncheck_5.size()>5000){
 						// 写入txt文件
-						fileUtil.writeMap2Txt(term_uncheck_5, ConstantValue.DATA_ROOT_PATH+"term\\online\\wait_online_check-5.txt", true);
+						fileUtil.writeMap2Txt(term_uncheck_5, ConstantValue.DATA_ROOT_PATH+"term/online/wait_online_check-5.txt", true);
 						term_uncheck_5.clear();
 						System.out.println("--term_uncheck_5 write--");
 					}
@@ -176,7 +176,7 @@ public class UtilAction {
 					term_uncheck_6.put(term.getKey(), term.getValue());
 					if(term_uncheck_6.size()>5000){
 						// 写入txt文件
-						fileUtil.writeMap2Txt(term_uncheck_6, ConstantValue.DATA_ROOT_PATH+"term\\online\\wait_online_check-6.txt", true);
+						fileUtil.writeMap2Txt(term_uncheck_6, ConstantValue.DATA_ROOT_PATH+"term/online/wait_online_check-6.txt", true);
 						term_uncheck_6.clear();
 						System.out.println("--term_uncheck_6 write--");
 					}
@@ -185,7 +185,7 @@ public class UtilAction {
 					term_uncheck_7.put(term.getKey(), term.getValue());
 					if(term_uncheck_7.size()>5000){
 						// 写入txt文件
-						fileUtil.writeMap2Txt(term_uncheck_7, ConstantValue.DATA_ROOT_PATH+"term\\online\\wait_online_check-7.txt", true);
+						fileUtil.writeMap2Txt(term_uncheck_7, ConstantValue.DATA_ROOT_PATH+"term/online/wait_online_check-7.txt", true);
 						term_uncheck_7.clear();
 						System.out.println("--term_uncheck_7 write--");
 					}
@@ -194,7 +194,7 @@ public class UtilAction {
 					term_uncheck_8.put(term.getKey(), term.getValue());
 					if(term_uncheck_8.size()>5000){
 						// 写入txt文件
-						fileUtil.writeMap2Txt(term_uncheck_8, ConstantValue.DATA_ROOT_PATH+"term\\online\\wait_online_check-8.txt", true);
+						fileUtil.writeMap2Txt(term_uncheck_8, ConstantValue.DATA_ROOT_PATH+"term/online/wait_online_check-8.txt", true);
 						term_uncheck_5.clear();
 						System.out.println("--term_uncheck_8 write--");
 					}
@@ -209,14 +209,14 @@ public class UtilAction {
 		}
 		System.out.println("count_term_check: " + count_term_check + "  , count_term_ok_no: " + count_term_ok_no + "  , count_term_child: " + count_term_child);
 		// 写入txt文件
-		fileUtil.writeMap2Txt(term_uncheck_2, ConstantValue.DATA_ROOT_PATH+"term\\online\\wait_online_check-2.txt", true);
-		fileUtil.writeMap2Txt(term_uncheck_3, ConstantValue.DATA_ROOT_PATH+"term\\online\\wait_online_check-3.txt", true);
-		fileUtil.writeMap2Txt(term_uncheck_4, ConstantValue.DATA_ROOT_PATH+"term\\online\\wait_online_check-4.txt", true);
-		fileUtil.writeMap2Txt(term_uncheck_5, ConstantValue.DATA_ROOT_PATH+"term\\online\\wait_online_check-5.txt", true);
-		fileUtil.writeMap2Txt(term_uncheck_6, ConstantValue.DATA_ROOT_PATH+"term\\online\\wait_online_check-6.txt", true);
-		fileUtil.writeMap2Txt(term_uncheck_7, ConstantValue.DATA_ROOT_PATH+"term\\online\\wait_online_check-7.txt", true);
-		fileUtil.writeMap2Txt(term_uncheck_8, ConstantValue.DATA_ROOT_PATH+"term\\online\\wait_online_check-8.txt", true);
-		fileUtil.writeTxt(term_uncheck_0, ConstantValue.DATA_ROOT_PATH+"term\\online\\wait_online_check-0.txt", false);
+		fileUtil.writeMap2Txt(term_uncheck_2, ConstantValue.DATA_ROOT_PATH+"term/online/wait_online_check-2.txt", true);
+		fileUtil.writeMap2Txt(term_uncheck_3, ConstantValue.DATA_ROOT_PATH+"term/online/wait_online_check-3.txt", true);
+		fileUtil.writeMap2Txt(term_uncheck_4, ConstantValue.DATA_ROOT_PATH+"term/online/wait_online_check-4.txt", true);
+		fileUtil.writeMap2Txt(term_uncheck_5, ConstantValue.DATA_ROOT_PATH+"term/online/wait_online_check-5.txt", true);
+		fileUtil.writeMap2Txt(term_uncheck_6, ConstantValue.DATA_ROOT_PATH+"term/online/wait_online_check-6.txt", true);
+		fileUtil.writeMap2Txt(term_uncheck_7, ConstantValue.DATA_ROOT_PATH+"term/online/wait_online_check-7.txt", true);
+		fileUtil.writeMap2Txt(term_uncheck_8, ConstantValue.DATA_ROOT_PATH+"term/online/wait_online_check-8.txt", true);
+		fileUtil.writeTxt(term_uncheck_0, ConstantValue.DATA_ROOT_PATH+"term/online/wait_online_check-0.txt", false);
 		System.out.println("--over--");
 	}
 	
@@ -246,7 +246,36 @@ public class UtilAction {
 		}
 		
 		return map;
-	}	
+	}
+	
+	@Test
+	public void mergeSegmentWord() throws IOException {
+		String[] filepaths = {ConstantValue.SEGMENT_PATH + "answer_total_segment.txt",
+							ConstantValue.SEGMENT_PATH + "train_total_segment.txt"};
+		// 实例化InputStreamReader
+		InputStreamReader read = null;
+		BufferedReader bufferedReader = null;
+		Map<String, Integer> mergeWord = new HashMap<>();
+		
+		//遍历读取对应的文件记录
+		for (String filepath : filepaths) {
+			File file = new File(filepath);
+			read = new InputStreamReader(new FileInputStream(file),"UTF-8");//考虑到编码格式
+			bufferedReader = new BufferedReader(read);
+			String lineTxt = null;
+			while((lineTxt = bufferedReader.readLine()) != null){
+				String[] words = lineTxt.split("\t");
+				if(words.length==2){
+					String word = words[0].trim().replaceAll("_", "");
+					int w_count = Integer.parseInt(words[1]);
+					Integer count = mergeWord.get(word);
+					mergeWord.put(word, count==null ? w_count : w_count+count);
+				}
+			}
+		}
+		// 写入txt文件
+		fileUtil.writeTxt(mergeWord, ConstantValue.SEGMENT_PATH + "total_segment.txt", false);
+	}
 	
 	/**
 	* @Title: countSegment
@@ -268,7 +297,7 @@ public class UtilAction {
 		
 		for (String dir : dirs) {
 			// 获取各领域文件夹
-			List<File> listDomains = fileUtil.getAllFileDirs(ConstantValue.SEGMENT_PATH+dir+"\\");
+			List<File> listDomains = fileUtil.getAllFileDirs(ConstantValue.SEGMENT_PATH+dir+"/");
 			// 首先统计各领域的分词结果
 			for (File domain : listDomains) {
 				List<File> listFiles = fileUtil.getAllFiles(domain.getPath());
@@ -300,10 +329,10 @@ public class UtilAction {
 					}
 				}
 				// 写入txt文件
-				fileUtil.writeTxt(map_domain_term, ConstantValue.SEGMENT_PATH+dir+"\\"+domain.getName()+".txt", false);
+				fileUtil.writeTxt(map_domain_term, ConstantValue.SEGMENT_PATH+dir+"/"+domain.getName()+".txt", false);
 			}
 			// 然后将各领域的分词结果统计汇总
-			List<File> listFiles = fileUtil.getAllFiles(ConstantValue.SEGMENT_PATH+dir+"\\");
+			List<File> listFiles = fileUtil.getAllFiles(ConstantValue.SEGMENT_PATH+dir+"/");
 			Map<String, Integer> map_term = new HashMap<>();
 			for (File file : listFiles) {
 				read = new InputStreamReader(new FileInputStream(file),"UTF-8");//考虑到编码格式
@@ -331,7 +360,7 @@ public class UtilAction {
 	*/
 	@Test
 	public void countOnlineInfo() throws IOException{
-		String onlineInfoPath = ConstantValue.DATA_ROOT_PATH + "online\\agg_online\\";
+		String onlineInfoPath = ConstantValue.DATA_ROOT_PATH + "online/agg_online/";
 		//读取指定文件夹下的所有文件
 		List<File> listFiles = fileUtil.getAllFiles(onlineInfoPath);
 		Map<String, String> map_term_ok = new HashMap<>();
@@ -416,7 +445,7 @@ public class UtilAction {
 	
 	// 统计在线术语比对结果，分别存储到指定文件夹
 	public void mergeTermOk() throws IOException{
-		String path = ConstantValue.DATA_ROOT_PATH + "online\\agg_online\\";
+		String path = ConstantValue.DATA_ROOT_PATH + "online/agg_online/";
 		List<File> listFiles = fileUtil.getAllFiles(path);
 		Map<String, String> map_term_ok = new HashMap<>();
 		Map<String, String> map_term_no = new HashMap<>();
@@ -458,8 +487,8 @@ public class UtilAction {
 				txt_online += term.getKey() + "\t" + term.getValue() + "\n";
 				txt += term.getKey() + "\n";
 			}
-			fileUtil.writeTxt(txt_online, ConstantValue.DATA_ROOT_PATH + "term\\" + txtName, true);
-			fileUtil.writeTxt(txt, ConstantValue.DATA_ROOT_PATH + "term\\" + txtName.replaceAll("online_", ""), true);
+			fileUtil.writeTxt(txt_online, ConstantValue.DATA_ROOT_PATH + "term/" + txtName, true);
+			fileUtil.writeTxt(txt, ConstantValue.DATA_ROOT_PATH + "term/" + txtName.replaceAll("online_", ""), true);
 			return true;
 		} else {
 			return false;

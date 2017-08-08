@@ -28,7 +28,7 @@ public class RelationServiceImpl implements RelationService {
 	// 计算概念特征向量
 	@Override
 	public void featureVector(String domainName, String typeName, String conceptPath, int feautreSize) {
-		String vector_path = ConstantValue.CONCEPT_VECTOR_PATH + typeName + "\\" + domainName;
+		String vector_path = ConstantValue.CONCEPT_VECTOR_PATH + typeName + "/" + domainName;
 		// 添加文件夹
 		File file = new File(vector_path);
 		if(!file.exists()){
@@ -84,10 +84,10 @@ public class RelationServiceImpl implements RelationService {
 				}
 				listComputed.add(concept);
 				//写入文件
-//				writeConceptVectorToTxt(conceptVector, vector_path + "\\" + concept + ".txt");
+//				writeConceptVectorToTxt(conceptVector, vector_path + "/" + concept + ".txt");
 //				System.out.println(concept + "\t" + conceptVector.size());
 				if(conceptVector.size()>feautreSize){
-					writeConceptVectorToTxt(conceptVector, vector_path + "\\" + concept + ".txt");
+					writeConceptVectorToTxt(conceptVector, vector_path + "/" + concept + ".txt");
 					System.out.println(concept + " vector compute!");
 					//listConceptVectors.add(conceptVector);
 				}
@@ -175,7 +175,7 @@ public class RelationServiceImpl implements RelationService {
 	*/
 	private List<String> loadDomainSentence(String domainName, String typeName) throws IOException{
 		List<String> listSentence = new ArrayList<>();
-		List<File> listFiles = fileUtil.getAllFiles(ConstantValue.PREDEAL_PATH+typeName+"\\"+domainName);
+		List<File> listFiles = fileUtil.getAllFiles(ConstantValue.PREDEAL_PATH+typeName+"/"+domainName);
 		InputStreamReader read = null;// 考虑到编码格式
 		BufferedReader bufferedReader = null;
 		for (File file : listFiles) {
@@ -212,7 +212,7 @@ public class RelationServiceImpl implements RelationService {
 	public void countIndexMatrix(String typeName, String domainName) throws IOException {
 		List<String> listConcepts = new ArrayList<>();
 		// 读取指定领域的概念特征向量所在的文件夹下的所有文件
-		List<File> listFiles = fileUtil.getAllFiles(ConstantValue.CONCEPT_VECTOR_PATH+typeName+"\\"+domainName);
+		List<File> listFiles = fileUtil.getAllFiles(ConstantValue.CONCEPT_VECTOR_PATH+typeName+"/"+domainName);
 		// 首先统计在所有概念中都起作用的特征词索引
 		HashSet<Integer> term_indexs = new HashSet<>();
 		InputStreamReader read = null;
@@ -251,13 +251,13 @@ public class RelationServiceImpl implements RelationService {
 			}
 			read.close();
 		}
-        writeMatrix(primaryArray, ConstantValue.CONCEPT_VECTOR_PATH+typeName+"\\"+domainName+"_1_origin.txt");
+        writeMatrix(primaryArray, ConstantValue.CONCEPT_VECTOR_PATH+typeName+"/"+domainName+"_1_origin.txt");
         // 按当前读取顺序写入概念名
         String txt = "";
         for (String concept : listConcepts) {
 			txt += concept + "\n";
 		}
-        fileUtil.writeTxt(txt, ConstantValue.CONCEPT_VECTOR_PATH+typeName+"\\"+domainName+".txt", false);
+        fileUtil.writeTxt(txt, ConstantValue.CONCEPT_VECTOR_PATH+typeName+"/"+domainName+".txt", false);
 	}
 	
 	private void writeMatrix(double[][] matrix, String fileName) throws IOException{
@@ -439,15 +439,15 @@ public class RelationServiceImpl implements RelationService {
 	@Override
 	public void conceptRelated(String type, String domainName, double limit) throws IOException {
 		//1、顺序读取概念
-		List<String> listConcepts = loadConcepts(ConstantValue.CONCEPT_VECTOR_PATH+type+"\\"+domainName+".txt");
+		List<String> listConcepts = loadConcepts(ConstantValue.CONCEPT_VECTOR_PATH+type+"/"+domainName+".txt");
 		//2、顺序读取概念特征向量
-		List<double[]> listConceptVector = loadMatrix(ConstantValue.CONCEPT_VECTOR_PATH+type+ "\\" + domainName + "_1_origin.txt");
+		List<double[]> listConceptVector = loadMatrix(ConstantValue.CONCEPT_VECTOR_PATH+type+ "/" + domainName + "_1_origin.txt");
 		
 		HashSet<String> setConcepts = new HashSet<>();
 		
 		int size = listConcepts.size();
 		String txt = "";
-		String fileName = ConstantValue.RELATION_PATH+type+"\\"+domainName+"_concept_consin.txt";
+		String fileName = ConstantValue.RELATION_PATH+type+"/"+domainName+"_concept_consin.txt";
 		for(int i=0; i<size-1; i++){
 			for(int j=i+1; j<size; j++){
 				double cosin = computeCosin(listConceptVector.get(i), listConceptVector.get(j));
@@ -475,13 +475,13 @@ public class RelationServiceImpl implements RelationService {
 				}
 				txt += "\n";
 				if(txt.length()>10000){
-					fileUtil.writeTxt(txt, ConstantValue.RELATION_PATH+type+"\\"+domainName + "_2_cosin.txt", true);
+					fileUtil.writeTxt(txt, ConstantValue.RELATION_PATH+type+"/"+domainName + "_2_cosin.txt", true);
 					txt = "";
 				}
 			}
 		}
-		fileUtil.writeTxt(txt_concept, ConstantValue.RELATION_PATH+type+"\\"+domainName + "_cosin.txt", true);
-		fileUtil.writeTxt(txt, ConstantValue.RELATION_PATH+type+"\\"+domainName + "_2_cosin.txt", true);
+		fileUtil.writeTxt(txt_concept, ConstantValue.RELATION_PATH+type+"/"+domainName + "_cosin.txt", true);
+		fileUtil.writeTxt(txt, ConstantValue.RELATION_PATH+type+"/"+domainName + "_2_cosin.txt", true);
 		
 		// --------测试阈值-------------- //
 		//读取已有的概念对

@@ -54,7 +54,7 @@ public class TermServiceImpl implements TermService {
 			//4、遍历所有文件，删除对应的无效原子词
 			for (File file : listFiles) {
 				// 若没有当前领域的文件夹，则创建
-				File temp = new File(resultpath+"\\"+fileDir.getName());
+				File temp = new File(resultpath+"/"+fileDir.getName());
 				if(!temp.exists()){
 					temp.mkdirs();
 				}
@@ -80,7 +80,7 @@ public class TermServiceImpl implements TermService {
 					}
 				}
 				//4.3、将有效原子词写入文件
-				fileUtil.writeTxt(txt, resultpath+"\\"+fileDir.getName()+"\\"+file.getName(), false);
+				fileUtil.writeTxt(txt, resultpath+"/"+fileDir.getName()+"/"+file.getName(), false);
 			}
 		}
 	}
@@ -268,34 +268,34 @@ public class TermServiceImpl implements TermService {
 				int rst = checkTerm(temp[0].replaceAll("_", ""));
 				//保存在线查询的信息
 				if(mapOnlineInfo_all.size() == pageSize){
-//					String filepath = basepath+"\\online_info\\all_"+(count_onlineInfo_all++)+".txt";
-					String filepath = basepath+"\\online_info\\all_"+file.getName();
+//					String filepath = basepath+"/online_info/all_"+(count_onlineInfo_all++)+".txt";
+					String filepath = basepath+"/online_info/all_"+file.getName();
 					write(mapOnlineInfo_all, filepath);
 					mapOnlineInfo_all.clear();
 				}
 				if(mapOnlineInfo_agg.size() == pageSize){
-//					String filepath = basepath+"\\online_info\\agg_"+(count_onlineInfo_agg++)+".txt";
-					String filepath = basepath+"\\online_info\\agg_"+file.getName();
+//					String filepath = basepath+"/online_info/agg_"+(count_onlineInfo_agg++)+".txt";
+					String filepath = basepath+"/online_info/agg_"+file.getName();
 					write(mapOnlineInfo_agg, filepath);
 					mapOnlineInfo_agg.clear();
 				}
 				if(rst==1){
 					if(listTerms.size()==pageSize){
-						write(listTerms, basepath+"\\online\\"+file.getName());
+						write(listTerms, basepath+"/online/"+file.getName());
 						listTerms.clear();
 						System.out.println("listTerm 第" + (count_term++) + "次");
 					}
 					listTerms.add(dealTerm);
 				} else if(rst==3){
 					if(listUnKonw.size()==pageSize){
-						write(listUnKonw, basepath+"\\unknow\\"+file.getName());
+						write(listUnKonw, basepath+"/unknow/"+file.getName());
 						listUnKonw.clear();
 						System.out.println("listUnKonw 第" + (count_unknow++) + "次");
 					}
 					listUnKonw.add(dealTerm);
 				} else {
 					if(listUnword.size()==pageSize){
-						write(listUnword, basepath+"\\unword\\"+file.getName());
+						write(listUnword, basepath+"/unword/"+file.getName());
 						listUnword.clear();
 						System.out.println("listUnword 第" + (count_unword++) + "次");
 					}
@@ -303,18 +303,18 @@ public class TermServiceImpl implements TermService {
 				}
 			}
 			//最后不管有多少，均写入
-			write(listTerms, basepath+"\\online\\"+file.getName());
+			write(listTerms, basepath+"/online/"+file.getName());
 			System.out.println("listTerm 第" + count_term + "次");
-			write(listUnKonw, basepath+"\\unknow\\"+file.getName());
+			write(listUnKonw, basepath+"/unknow/"+file.getName());
 			System.out.println("listUnKonw 第" + count_unknow + "次");
-			write(listUnword, basepath+"\\unword\\"+file.getName());
+			write(listUnword, basepath+"/unword/"+file.getName());
 			System.out.println("listUnword 第" + count_unword + "次");
 			// 写入mapOnlineInfo_all
-			String filepath = basepath+"\\online_info\\all_"+file.getName();
+			String filepath = basepath+"/online_info/all_"+file.getName();
 			write(mapOnlineInfo_all, filepath);
 			mapOnlineInfo_all.clear();
 			// 写入mapOnlineInfo_agg
-			filepath = basepath+"\\online_info\\agg_"+file.getName();
+			filepath = basepath+"/online_info/agg_"+file.getName();
 			write(mapOnlineInfo_agg, filepath);
 			mapOnlineInfo_agg.clear();
 		}
