@@ -12,8 +12,8 @@ import java.util.Map;
 */
 public class ConstantValue {
 
-//	public static String DATA_ROOT_PATH = "D:/ontology/data/";	// 数据处理的根文件目录
-	public static String DATA_ROOT_PATH = "/Users/lz/desktop/ontology/data/";	// 数据处理的根文件目录
+	public static String DATA_ROOT_PATH = "D:/ontology/data/";	// 数据处理的根文件目录
+//	public static String DATA_ROOT_PATH = "/Users/lz/desktop/ontology/data/";	// 数据处理的根文件目录
 	public static String CORPUS_PATH = DATA_ROOT_PATH + "corpus/";	// 原始语料库路径
 	public static String PREDEAL_PATH = DATA_ROOT_PATH + "predeal/corpus/";	// 预处理后的语料库路径
 	public static String SEGMENT_PATH = DATA_ROOT_PATH + "predeal/segment/";	// 预处理后的分词结果路径
