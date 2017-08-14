@@ -209,6 +209,27 @@ public class FileUtil {
 		}
 		return files;
 	}
+	
+	/**
+	* @Title: traverseFile
+	* @Description: 递归遍历获取指定文件夹下的所有文件
+	*/
+	public List<File> traverseFile(String rootpath){
+		File file = new File(rootpath);		//获取指定文件位置
+		File[] files = file.listFiles();	// 该文件目录下文件全部放入数组
+		List<File> listFiles = new ArrayList<>();
+		
+		if(files != null){
+			for(int i=0; i<files.length; i++){
+				if(files[i].isFile()){
+					listFiles.add(files[i]);
+				} else if(files[i].isDirectory()){
+					listFiles.addAll(traverseFile(files[i].getAbsolutePath()));
+				}
+			}
+		}
+		return listFiles;
+	}
 
 	/**
 	 * @Title: getAllFileDirs
@@ -265,7 +286,7 @@ public class FileUtil {
 
 	/**
 	 * @Title: writeTxt
-	 * @Description: 将Map<String, Integer>写入文件
+	 * @Description: 将Map<String, String>写入文件
 	 * @param word_map
 	 * @param path
 	 */
