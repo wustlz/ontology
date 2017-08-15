@@ -97,7 +97,7 @@ public class TermAction {
 			map_word_tfidf.put(word.getKey().trim(), word.getValue() + "\t" + df.format(tf*idf) + "\t" 
 								+ df.format(tf) + "\t" + df.format(idf));
 			// 为了避免内存过大，设置一定长度后就写入本地文件
-			if(map_word_tfidf.size()>5){
+			if(map_word_tfidf.size()>300){
 				fileUtil.writeMap2Txt(map_word_tfidf, ConstantValue.WORD_TFIDF_FILE, true);
 				map_word_tfidf.clear();
 			}

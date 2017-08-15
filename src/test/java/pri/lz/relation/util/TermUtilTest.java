@@ -14,6 +14,10 @@ public class TermUtilTest {
 	@Test
 	public void testMath(){
 		System.out.println((double)3/5);
+		System.out.println(Math.log(2));
+		System.out.println(Math.log(5));
+		System.out.println(Math.log(10/9));
+		System.out.println(Math.pow(Math.E, 0.69));
 	}
 
 }
