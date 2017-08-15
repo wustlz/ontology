@@ -72,6 +72,7 @@ public class TermAction {
 		for(Entry<String, String> word : map_words.entrySet()){
 			total_word += Integer.parseInt(word.getValue().trim());
 		}
+		System.out.println("文档总数：" + doc_count + " , 词频总数：" + total_word + " , 词个数：" + map_words.size());
 		
 		//遍历计算TF-IDF
 		Map<String, Object> map_word_tfidf = new HashMap<>();	//存储对应词的IDF值
@@ -85,6 +86,7 @@ public class TermAction {
 					contain_count++;
 				}
 			}
+			System.out.println(word.getKey() + " -> " + contain_count);
 			//根据公式计算IDF值
 			double idf = Math.log(doc_count/(contain_count+1));
 			
