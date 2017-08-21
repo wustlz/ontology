@@ -32,10 +32,10 @@ public class ConceptAction {
 //		action.countIndexMatrix();
 		
 		// 计算概念相关度
-//		action.computeRelated();
+		action.computeRelated();
 		
 		// 通过BP神经网络训练
-		action.trainByBP();
+//		action.trainByBP();
 		
 		// 根据BP神经网络模型对具有相关度的概念对进行关系分类
 //		action.clssifyRelation();
@@ -122,7 +122,7 @@ public class ConceptAction {
 	
 	// 计算概念之间的相关度
 	public void computeRelated(){
-		double limit = 0.4;
+		double limit = 0.3;
 		String type = "train";
 		String domainName = "C19-Computer";
 		RelationService relationService = new RelationServiceImpl();

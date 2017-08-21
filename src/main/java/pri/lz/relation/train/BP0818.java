@@ -32,10 +32,10 @@ public class BP0818 {
 		long start = System.currentTimeMillis();
 		
 		// 通过BP神经网络训练
-		action.train();
+//		action.train();
 		
 		// 根据BP神经网络模型对具有相关度的概念对进行关系分类
-//		action.clssifyRelation();
+		action.clssifyRelation();
 		
 		long end = System.currentTimeMillis();
 		System.out.println("--end: " + (end-start) + " ms--");
@@ -51,7 +51,7 @@ public class BP0818 {
 			// 顺序读取概念，对应概念特征向量
 			List<String> listConcepts = util.loadConcepts(ConstantValue.MODEL_PATH+domainName+".txt");
 			// 顺序读取概念特征向量
-			List<double[]> listVectors = util.loadMatrix(ConstantValue.MODEL_PATH+domainName+"_2_lle.txt");
+			List<double[]> listVectors = util.loadMatrix(ConstantValue.MODEL_PATH+domainName+"_1_origin.txt");
 			System.out.println("listCandidateConcepts: " + listCandidateConcepts.size());
 			System.out.println("listConcepts: " + listConcepts.size());
 			System.out.println("listVectors: " + listVectors.size());
