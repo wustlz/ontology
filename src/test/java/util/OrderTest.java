@@ -1,12 +1,44 @@
 package util;
 
 import java.io.File;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import org.junit.Test;
 
 import pri.lz.relation.util.ConstantValue;
 
 public class OrderTest {
+	
+	private AtomicInteger counter = new AtomicInteger(0);
+	   ReadWriteLock readWriteLock = new ReentrantReadWriteLock();
+	   public int mutexBiz() {
+	      try {
+	         if (!readWriteLock.writeLock().tryLock()) {
+	            return -1;
+	         }
+	         return counter.getAndIncrement();
+	      } finally {
+	         readWriteLock.writeLock().unlock();
+	      }
+	   }
+	 
+	   public static void main(String[] args) throws InterruptedException {
+	      final OrderTest lockTest = new OrderTest();
+	      for (int i = 0; i < 5; i++) {
+	         new Thread(new Runnable() {
+	            public void run() {
+	                try {
+	                   System.out.print(lockTest.mutexBiz());
+	                } catch (Exception e) {
+	                   System.out.print("-2");
+	                }
+	            }
+	         }).start();
+	      }
+	      Thread.sleep(5000);
+	   }
 
 	// 冒泡排序
 	@Test
