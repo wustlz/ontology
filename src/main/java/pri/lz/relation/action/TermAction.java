@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.text.DecimalFormat;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -47,11 +48,65 @@ public class TermAction {
 //		termAction.dealTerm();
 		
 		//3、将候选概念词集合与术语词典相比对，获取概念词集合
-		termAction.checkTerms();
+//		termAction.checkTerms();
+		//3、将分词结果集合通过TF-IDF，获取特征词典集合
+		termAction.buildFetureDic();
 		
 		System.out.println("--over--");
 	}
 	
+	/**
+	* @Title: buildFetureDic
+	* @Description: 构建特征词典，通过TF-IDF
+	*/
+	public void buildFetureDic() throws IOException{
+		// 获取预处理语料库下的所有文档
+		List<File> listFiles = fileUtil.traverseFile(ConstantValue.PREDEAL_PATH);
+		// 统计语料库中的文档总数
+		int doc_count = listFiles.size();
+		// 获取汇总后的分词结果
+		Map<String, String> map_words = fileUtil.readInfo(ConstantValue.WORD_LIST_FILE);
+		
+		//统计总词频数
+		int total_word = 0;
+		for(Entry<String, String> word : map_words.entrySet()){
+			total_word += Integer.parseInt(word.getValue().trim());
+		}
+		System.out.println("文档总数：" + doc_count + " , 词频总数：" + total_word + " , 词个数：" + map_words.size());
+		
+		//遍历计算TF-IDF
+		Map<String, Object> map_word_tfidf = new HashMap<>();	//存储对应词的IDF值
+		DecimalFormat df = new DecimalFormat("#.00000");	//保留小数位
+		for(Entry<String, String> word : map_words.entrySet()){
+			//统计包含当前词的文档数
+			int contain_count = 0;
+			for (File file : listFiles) {
+				String text = fileUtil.readTxt(file, "UTF-8");
+				if(text.indexOf(word.getKey().trim()) >= 0){
+					contain_count++;
+				}
+			}
+			System.out.println(word.getKey() + " -> " + contain_count);
+			//根据公式计算IDF值
+			double idf = Math.log(doc_count/(contain_count+1));
+			
+			//计算TF值
+			double tf = (double) Integer.parseInt(word.getValue().trim())/total_word ;
+			
+			//计算tf-idf，并存储按照“词频 tfidf tf idf”存储到map集合中
+			map_word_tfidf.put(word.getKey().trim(), word.getValue() + "\t" + df.format(tf*idf) + "\t" 
+								+ df.format(tf) + "\t" + df.format(idf));
+			// 为了避免内存过大，设置一定长度后就写入本地文件
+			if(map_word_tfidf.size()>300){
+				fileUtil.writeMap2Txt(map_word_tfidf, ConstantValue.WORD_TFIDF_FILE, true);
+				map_word_tfidf.clear();
+			}
+		}
+		
+		//将计算结果写入到本地文件
+		fileUtil.writeMap2Txt(map_word_tfidf, ConstantValue.WORD_TFIDF_FILE, true);
+	}
+
 	/**
 	* @Title: getConcepts
 	* @Description: 将候选概念词集合与术语词典相比对，获取概念词集合
