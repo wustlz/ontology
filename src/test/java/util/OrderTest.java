@@ -1,12 +1,29 @@
 package util;
 
 import java.io.File;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import org.junit.Test;
 
 import pri.lz.relation.util.ConstantValue;
 
 public class OrderTest {
+	
+	@Test
+	public void computeDate() throws ParseException {
+		String s_start = "2012-12-1";
+		String s_end = "2017-9-8";
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+		Date d_start = sdf.parse(s_start);
+		Date d_end = sdf.parse(s_end);
+		long start = d_start.getTime();
+		long end = d_end.getTime();
+		long times = (end-start)/1000;
+		times /= 3600;
+		System.out.println(d_end + " - " + d_start + " = " + times/24);
+	}
 
 	// 冒泡排序
 	@Test
