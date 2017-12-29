@@ -50,4 +50,14 @@ public interface PreDealService {
 	* @throws IOException
 	*/
 	public void seg2TXTByICTCLAS(String fileDir, String resultDir, String NLPIR) throws IOException;
+
+	/**
+	* @Title: mergeTxt
+	* @Description: 将当前文件夹下的所有文件合并为一个TXT
+	* @param @param filePath-文件夹路径
+	* @param @param fileName-存储的文件名
+	* @param @param storePath-存储的文件夹路径
+	* @return void
+	*/
+	public void mergeTxt(String filePath, String fileName, String storePath) throws IOException;
 }

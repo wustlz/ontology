@@ -77,17 +77,20 @@ public class PreDealServiceImpl implements PreDealService {
 		// 依次读取file集合中的数据
 		String lineTxt = null;
 		for (File file : listFiles) {
-			String txt = "";	//写入文件的txt变量
+			String txt = "";	//首先将内容合并为1句话
 			read = new InputStreamReader(new FileInputStream(file),"UTF-8");
 			bufferedReader = new BufferedReader(read);
 			//按行循环读取
 			while((lineTxt = bufferedReader.readLine()) != null){
-				//按照句子结束符号切割
-				String[] sentences = lineTxt.split(endStr);
-				for (String sentence : sentences) {
-					if(sentence.length()>4){
-						txt += sentence + "\n";
-					}
+				txt += lineTxt.trim();
+			}
+			//将整片文章拆分成句,按照句子结束符号切割
+			String[] sentences = txt.split(endStr);
+			//按行写入txt
+			txt = "";
+			for (String sentence : sentences) {
+				if(sentence.length()>4){
+					txt += sentence + "\n";
 				}
 			}
 			// 判断文件夹是否创建
@@ -135,13 +138,15 @@ public class PreDealServiceImpl implements PreDealService {
 		}
 		
 		//2、首先获取待处理文件集合
-		FileUtil fileUtil = new FileUtil();
 		List<File> listFiles = fileUtil.getAllFiles(fileDir);
+		// 导入自定义的概念词典
+		int nCount = CLibrary.Instance.NLPIR_ImportUserDict("D:\\ontology\\data\\util\\concept_dic.txt",true);   
+        System.out.println(String.format("已导入%d个用户词汇", nCount));   
 		
 		//3、遍历所有文件，进行相应操作
 		for (File file : listFiles) {
 			//3.1、读取对应的TXT文件内容
-			String txt = fileUtil.readTxt(file, "UTF-8");
+			String txt = fileUtil.readTxtAll(file, "UTF-8");
 			//3.2、分词, nativeBytes为分词结果，形如: 据悉/v ，/wd 质检/vn 总局/n 已/d 将/d 最新/a 有关/vn
 			nativeBytes = CLibrary.Instance.NLPIR_ParagraphProcess(txt, 1);
 			//3.3、将分词结果写入指定文件
@@ -196,8 +201,30 @@ public class PreDealServiceImpl implements PreDealService {
 //			public String NLPIR_GetFileKeyWords(String sLine, int nMaxKeyLimit, boolean bWeightOut);
 //			public int NLPIR_AddUserWord(String sWord);//add by qp 2008.11.10
 //			public int NLPIR_DelUsrWord(String sWord);//add by qp 2008.11.10
+		// 导入用户自定义词典：自定义词典路径，bOverwrite=true表示替代当前的自定义词典，false表示添加到当前自定义词典后    
+        public int NLPIR_ImportUserDict(String sFilename, boolean bOverwrite);
 		public String NLPIR_GetLastErrorMsg();
 		public void NLPIR_Exit();
+	}
+
+	//将当前文件夹下的所有文件合并为一个TXT
+	@Override
+	public void mergeTxt(String filePath, String fileName, String storePath) throws IOException {
+		//1、首先获取待处理文件集合
+		List<File> listFiles = fileUtil.getAllFiles(filePath);
+		//2、遍历所有文件，进行相应操作
+		String txt = "";
+		for (File file : listFiles) {
+			//读取对应的TXT文件内容
+			txt += fileUtil.readTxtAll(file, "UTF-8").trim() + "\n";
+			if(txt.length()>100000) {
+				//3、将TXT写入文件
+				fileUtil.writeTxt(txt, storePath+fileName+".txt", true);
+				txt = "";
+			}
+		}
+		//3、将TXT写入文件
+		fileUtil.writeTxt(txt, storePath+fileName+".txt", true);
 	}
 
 }

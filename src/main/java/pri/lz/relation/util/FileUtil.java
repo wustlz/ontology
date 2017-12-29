@@ -19,8 +19,7 @@ public class FileUtil {
 	/**
 	 * @Title: readTxt
 	 * @Description: 全部读取当前文件
-	 * @param @param
-	 *            path
+	 * @param @param path
 	 * @return String
 	 * @throws IOException
 	 */
@@ -62,7 +61,7 @@ public class FileUtil {
 
 	/**
 	 * @Title: readTxt
-	 * @Description: 以指定编码读取当前文件的全部内容
+	 * @Description: 以指定编码按行读取当前文件的全部内容
 	 * @param file-File参数
 	 * @return String
 	 * @throws IOException
@@ -75,6 +74,27 @@ public class FileUtil {
 			String lineTxt = null;
 			while ((lineTxt = bufferedReader.readLine()) != null) {
 				text += lineTxt + "\n";
+			}
+			read.close();
+		}
+		return text;
+	}
+	
+	/**
+	 * @Title: readTxt
+	 * @Description: 以指定编码读取当前文件的全部内容
+	 * @param file-File参数
+	 * @return String
+	 * @throws IOException
+	 */
+	public String readTxtAll(File file, String encoding) throws IOException {
+		String text = "";
+		if (file.isFile() && file.exists()) { // 判断文件是否存在
+			InputStreamReader read = new InputStreamReader(new FileInputStream(file), encoding);// 考虑到编码格式
+			BufferedReader bufferedReader = new BufferedReader(read);
+			String lineTxt = null;
+			while ((lineTxt = bufferedReader.readLine()) != null) {
+				text += lineTxt.trim();
 			}
 			read.close();
 		}

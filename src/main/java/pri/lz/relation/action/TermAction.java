@@ -25,10 +25,10 @@ import pri.lz.relation.util.MapUtil;
 /**
 * @ClassName: TermAction
 * @Description: 系统第2步，完成对原子词的处理，最终得到概念集合和特征词集合，主要过程如下：
-* 				1）对原子词集合进行术语提取，首先通过停用词性和停用词筛选，然后利用原子词步长法，初步筛选出术语集合term/1st；
-* 				2）对初步获取的术语集合进行停用词筛选、词频筛选、去重，得到候选概念词集合term/2nd；
-* 				3）将分词结果与术语词典相比对，得到特征词典集合term/
-* 				4）将候选概念词集合与术语词典相比对，获取概念词集合concept/
+* 				1）对原子词集合进行术语提取，首先通过停用词性和停用词筛选，然后利用原子词步长法，初步筛选出术语集合2-term/1st；
+* 				2）对初步获取的术语集合进行停用词筛选、词频筛选、去重，得到候选概念词集合2-term/2nd；
+* 				3）将分词结果与术语词典相比对，得到特征词典集合2_segment/tfIdf_segment.txt
+* 				4）将候选概念词集合与术语词典相比对，获取概念词集合2-concept/
 * @author 廖劲为
 * @date 2017年6月13日 下午8:29:20
 * 
@@ -40,6 +40,9 @@ public class TermAction {
 	public static void main(String[] args) throws IOException {
 		TermAction termAction = new TermAction();
 		
+		//0、根据停用词性及停用词筛选原子词
+//		termAction.filterAtom();
+		
 		//1、根据原子词步长法，初步获取术语集合
 //		int minfrequency = 2;	//阈值
 //		termAction.getTerm(minfrequency);
@@ -47,14 +50,50 @@ public class TermAction {
 		//2、处理初步获取的术语集合，得到候选概念词集合
 //		termAction.dealTerm();
 		
-		//3、将候选概念词集合与术语词典相比对，获取概念词集合
-//		termAction.checkTerms();
 		//3、将分词结果集合通过TF-IDF，获取特征词典集合
-		termAction.buildFetureDic();
+//		termAction.buildFetureDic();
+		
+		//4、将候选概念词集合与术语词典相比对，获取概念词集合
+		termAction.checkTerms();
+		
+		//5、根据术语词典，提取各领域概念词
+//		termAction.getTermByDomain();
 		
 		System.out.println("--over--");
 	}
 	
+	/**
+	* @Title: getTermByDomain
+	* @Description: 根据术语词典的相关信息提取不同领域的术语作为概念词
+	* @return void
+	*/
+	private void getTermByDomain() {
+		//1、加载术语info
+		Map<String, String> online_term_info = fileUtil.readInfo(ConstantValue.ONLINE_INFO_OK);
+		//2、解析术语info，并按照领域存储
+		TermService termService = new TermServiceImpl();
+		termService.storeTermByxks(ConstantValue.TERM_3RD_PATH, online_term_info);
+	}
+
+	/**
+	* @Title: filterAtom
+	* @Description: 根据停用词性及停用词筛选原子词
+	* @return void
+	* @throws IOException 
+	*/
+	public void filterAtom() throws IOException {
+		//1、读取停用词性集合
+		HashSet<String> stopNatures = fileUtil.readDicUTF8(ConstantValue.UTIL_PATH+"stopnature.txt");
+		//2、读取停用词集合
+		HashSet<String> stopWords = fileUtil.readDicUTF8(ConstantValue.UTIL_PATH+"stopword.txt");
+		TermService termService = new TermServiceImpl();
+		//3、根据不同文件夹进行筛选
+		String[] dirs = {"train","answer"};
+		for (String dir : dirs) {
+			termService.delUnuseWord(ConstantValue.SEGMENT_PATH+dir, ConstantValue.WORD_PATH+dir, stopNatures, stopWords);
+		}
+	}
+
 	/**
 	* @Title: buildFetureDic
 	* @Description: 构建特征词典，通过TF-IDF
@@ -225,11 +264,7 @@ public class TermAction {
 	* @throws IOException
 	*/
 	public void getTerm(int minfrequency) throws IOException{
-		//1、读取停用词性集合
-		HashSet<String> stopNatures = fileUtil.readDicUTF8(ConstantValue.UTIL_PATH+"stopnature.txt");
-		//2、读取停用词集合
-		HashSet<String> stopWords = fileUtil.readDicUTF8(ConstantValue.UTIL_PATH+"stopword.txt");
-		TermService termService = new TermServiceImpl();
+		
 		String[] dirs = {"train","answer"};
 		for (String dir : dirs) {
 			//新建文件夹
@@ -237,29 +272,78 @@ public class TermAction {
 			if(!temp.exists()){
 				temp.mkdirs();
 			}
-			//1、删除无效原子词
-			termService.delUnuseWord(ConstantValue.SEGMENT_PATH+dir, ConstantValue.WORD_PATH+dir, stopNatures, stopWords);
 			
 			// 获取每个语料库下的所有领域文件夹
 			List<File> listDomains = fileUtil.getAllFileDirs(ConstantValue.WORD_PATH+dir);
-			for (File domain : listDomains) {
-				//2、根据原子词步长法获取相应术语集合
-				Map<String, Integer> terms = termService.atomTerm(ConstantValue.WORD_PATH+dir+"/"+domain.getName(),	//有效原子词文件夹路径
-						ConstantValue.PREDEAL_PATH+dir+"/"+domain.getName(),	//语料库预处理后的路径
-						minfrequency);	//阈值
-				System.out.println(terms.size());
-				//3、将term map集合按频率降序排列
-				MapUtil mapUtil = new MapUtil();
-				Map<String, Integer> termsOrderDesc = mapUtil.sortMapByValueDesc(terms, true);
-				//4、将排序后的术语集合写入到txt
-				String txt = "";
-				for(Entry<String, Integer> term : termsOrderDesc.entrySet()){
-					txt += term.getKey() + "\t" + term.getValue() + "\n";
-				}
-				fileUtil.writeTxt(txt, ConstantValue.TERM_1ST_PATH+dir+"/"+domain.getName()+".txt", false);
-			}
-			
+			Num i = new Num(0); // 新建对象，准备传递给线程
+			new AtomThread(i, listDomains, minfrequency, dir).start(); // 新建线程1，并启动
+			new AtomThread(i, listDomains, minfrequency, dir).start(); // 新建线程2，并启动
 		}
-	}	
+	}
+}
+
+/**
+* @ClassName: AtomThread
+* @Description: 多线程类，用于处理原子词步长法
+* @author 廖劲为
+* @date 2017年11月28日 下午3:29:02
+*/
+class AtomThread extends Thread {
+	Num id; // 申明对象，默认null，就是没有指向任何实体
+	int sno; // 申明int变量。因为系统默认初始化为0，所以应该是定义一个int变量
+	int minfrequency;	//最低阈值
+	String dir;	//train或answer，对应语料类别
 	
+	List<File> listDomains;	//领域文件夹
+
+	AtomThread(Num id, List<File> listDomains, int minfrequency, String dir) {
+		this.id = id;
+		this.listDomains = listDomains;
+		this.minfrequency = minfrequency;
+		this.dir = dir;
+	}
+
+	public void run() {
+		TermService termService = new TermServiceImpl();
+		FileUtil fileUtil = new FileUtil();
+		while (true) {
+			synchronized (this) {
+				sno = id.i; // 保存id.i的数值，到线程私有变量sno
+				if(sno>=listDomains.size()) {
+					break;
+				}
+				id.i++;
+				
+				File domain = listDomains.get(sno);	//获取当前需要操作的文件
+				
+				//根据原子词步长法获取相应术语集合
+				try {
+					Map<String, Integer> terms = termService.atomTerm(ConstantValue.WORD_PATH+dir+"/"+domain.getName(),	//有效原子词文件夹路径
+							ConstantValue.PREDEAL_PATH+dir+"/"+domain.getName(),	//语料库预处理后的路径
+							minfrequency);	//阈值
+					System.out.println(this.getName() + " : dir = " + dir + " -> name = " + domain.getName() + " -> " + terms.size());
+					//将term map集合按频率降序排列
+					MapUtil mapUtil = new MapUtil();
+					Map<String, Integer> termsOrderDesc = mapUtil.sortMapByValueDesc(terms, true);
+					//将排序后的术语集合写入到txt
+					String txt = "";
+					for(Entry<String, Integer> term : termsOrderDesc.entrySet()){
+						txt += term.getKey() + "\t" + term.getValue() + "\n";
+					}
+					fileUtil.writeTxt(txt, ConstantValue.TERM_1ST_PATH+dir+"/"+domain.getName()+".txt", false);
+				} catch (IOException e) {
+					e.printStackTrace();
+				}	
+			}
+		}
+	}
+}
+
+class Num{ // 定义一个类
+
+	int i;
+
+	Num(int i) {
+		this.i = i;
+	}
 }

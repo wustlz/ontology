@@ -12,9 +12,9 @@ import pri.lz.relation.util.FileUtil;
 /**
 * @ClassName: PreDealAction
 * @Description: 系统第1步，完成对语料库的预处理，最终得到原子词集合，主要过程如下：
-* 				1）原始语料pre_corpus的文件编码转换，全角-半角转换，得到预处理后的语料predeal/corpus；
-* 				2）通过中科院分词工具NLPIR对corpus分词处理，得到原子词集合predeal/segment；
-* 				3）对corpus进行切分成句处理，得到句子集合predeal/sentence；
+* 				1）原始语料pre_corpus的文件编码转换，全角-半角转换，得到预处理后的语料1_predeal/1_corpus；
+* 				2）通过中科院分词工具NLPIR对corpus分词处理，得到原子词集合1_predeal/2_segment；
+* 				3）对corpus进行切分成句处理，得到句子集合1_predeal/3_sentence；
 * @author 廖劲为
 * @date 2017年6月13日 下午7:55:35
 * 
@@ -38,13 +38,34 @@ public class PreDealAction {
 		main.segment(ConstantValue.PREDEAL_PATH, ConstantValue.SEGMENT_PATH, ConstantValue.NLPIR);
 		
 		//3、将预处理后的语料进行分句
-		main.getSentence(ConstantValue.PREDEAL_PATH);
+//		main.getSentence(ConstantValue.PREDEAL_PATH);
+		
+		//4、按照领域将文章整合到1个TXT文件
+//		main.mergePaper();
 		
 		long endTime = System.currentTimeMillis();
 		System.out.println("over, Time: " + (endTime-startTime) + "ms");
 
 	}
 	
+	/**
+	* @Title: mergePaper
+	* @Description: 按照领域将文章整合到1个TXT文件
+	* @return void
+	 * @throws IOException 
+	*/
+	public void mergePaper() throws IOException {
+		String[] dirs = {"train","answer"};
+		for (String dir : dirs) {
+			//1、根据语料库路径读取所有领域语料文件夹
+			List<File> listFileDirs = fileUtil.getAllFileDirs(ConstantValue.PREDEAL_PATH+dir+"/");
+			//2、遍历所有文件夹，读取领域文件夹下对应的文件，并将所有文件合并到一个文件
+			for (File fileDir : listFileDirs) {
+				preDealService.mergeTxt(fileDir.getPath(), fileDir.getName(), ConstantValue.PREDEAL_PATH+dir+"/");
+			}
+		}
+	}
+
 	/**
 	* @Title: segment
 	* @Description: 对预处理后的文件，每个txt作为一个单位进行分词处理，并将分词结果存储到txt文件

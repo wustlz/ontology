@@ -49,4 +49,13 @@ public interface TermService {
 	* @throws IOException
 	*/
 	public void checkTermOnline(String basepath, String termpath) throws IOException;
+
+	/**
+	* @Title: storeTermByxks
+	* @Description: 将术语按照xks进行归类存储
+	* @param @param tERM_3RD_PATH
+	* @param @param online_term_info
+	* @return void
+	*/
+	public void storeTermByxks(String dirpath, Map<String, String> online_term_info);
 }

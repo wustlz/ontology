@@ -26,7 +26,7 @@ public class ConceptAction {
 		long start = System.currentTimeMillis();
 		
 		// 计算概念特征向量并写入文件
-//		action.conceptVector();
+		action.conceptVector();
 		
 		// 统计指定领域的概念的特征向量矩阵
 //		action.countIndexMatrix();

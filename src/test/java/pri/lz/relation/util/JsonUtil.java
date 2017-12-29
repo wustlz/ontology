@@ -1,4 +1,4 @@
-package ontology;
+package pri.lz.relation.util;
 
 
 import org.junit.Test;

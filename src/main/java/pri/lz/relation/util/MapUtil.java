@@ -97,9 +97,7 @@ public class MapUtil {
 	 * @Title: sortMapByValue
 	 * @Description: 按值对map排序
 	 * @param @param oriMap
-	 * @param @return
 	 * @return Map<String,Integer>
-	 * @throws
 	 */ 
 	public Map<String, Integer> sortMapByValueDesc(Map<String, Integer> oriMap, boolean desc) {
 		Map<String, Integer> sortedMap = new LinkedHashMap<String, Integer>();
@@ -138,9 +136,7 @@ public class MapUtil {
 	 * @Title: sortMapByValue
 	 * @Description: 按值对map排序
 	 * @param @param oriMap
-	 * @param @return
 	 * @return Map<String,Integer>
-	 * @throws
 	 */ 
 	public Map<String, Double> sortMapDoubleByValueDesc(Map<String, Double> oriMap, boolean desc) {
 		Map<String, Double> sortedMap = new LinkedHashMap<String, Double>();

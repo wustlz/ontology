@@ -1,4 +1,4 @@
-package util;
+package pri.lz.relation.util;
 
 import java.io.File;
 import java.util.concurrent.atomic.AtomicInteger;

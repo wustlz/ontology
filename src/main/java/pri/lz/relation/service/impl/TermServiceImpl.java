@@ -95,7 +95,7 @@ public class TermServiceImpl implements TermService {
 		List<String> listCorpus = new ArrayList<>();
 		for (File file : listCorpusFiles) {
 			//读取文件相应内容并加载到listCorpus
-			listCorpus.add(fileUtil.readTxt(file, "UTF-8"));
+			listCorpus.add(fileUtil.readTxtAll(file, "UTF-8"));
 		}
 		
 		//2、按照txt文件为单位获取术语集合
@@ -210,6 +210,11 @@ public class TermServiceImpl implements TermService {
 //				return true;
 //			}
 //		}
+		for (String okStr : listOkStrs) {
+			if(okStr.replaceAll("_", "").equals(childStr.replaceAll("_", ""))){	//表示含有相同子串
+				return true;
+			}
+		}
 		return false;
 	}
 
@@ -398,5 +403,38 @@ public class TermServiceImpl implements TermService {
 			return 3;
 		}
 	}
+
+	//将术语按照xks进行归类存储
+	@Override
+	public void storeTermByxks(String dirpath, Map<String, String> online_term_info) {
+		Map<String, List<String>> map_term = new HashMap<>();	//key-xk，value-对应xk的术语
+		JSONObject jsonResult = null;
+		//遍历术语info
+		for(Entry<String, String> term_info : online_term_info.entrySet()) {
+			jsonResult = JSONObject.parseObject(term_info.getValue());	//转换为json对象
+			String[] xks = jsonResult.getString("xks").trim().split("，");	//获取xks
+			for(String xk : xks) {
+				List<String> list = map_term.get(xk);
+				if(list==null) {
+					list = new ArrayList<>();
+				}
+				list.add(term_info.getKey());
+				map_term.put(xk, list);
+			}
+		}
+		//将分类后的term写入文件
+		for(Entry<String, List<String>> xk_term : map_term.entrySet()) {
+			try {
+				String txt = "";
+				for(String t : xk_term.getValue()) {
+					txt += t + "\n";
+				}
+				fileUtil.writeTxt(txt, dirpath+xk_term.getKey()+".txt", false);
+			} catch (Exception e) {
+				continue;
+			}
+		} 
+	}
+	
 
 }
