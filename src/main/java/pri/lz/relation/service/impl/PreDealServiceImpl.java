@@ -9,11 +9,8 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.List;
 
-import com.sun.jna.Library;
-import com.sun.jna.Native;
-
+import pri.lz.ontology.util.SegmentUtil.CLibrary;
 import pri.lz.relation.service.PreDealService;
-import pri.lz.relation.util.ConstantValue;
 import pri.lz.relation.util.FileUtil;
 
 /**
@@ -188,24 +185,7 @@ public class PreDealServiceImpl implements PreDealService {
 		fileUtil.writeTxt(txt, resultDir+"//"+fileName, false);
 	}
 
-	// 定义接口CLibrary，继承自com.sun.jna.Library
-	public interface CLibrary extends Library {
-		// 定义并初始化接口的静态变量
-		CLibrary Instance = (CLibrary) Native.loadLibrary(ConstantValue.NLPIR+"/NLPIR", CLibrary.class);
-		
-		public int NLPIR_Init(String sDataPath, int encoding, String sLicenceCode);
-				
-		public String NLPIR_ParagraphProcess(String sSrc, int bPOSTagged);
-
-//			public String NLPIR_GetKeyWords(String sLine, int nMaxKeyLimit, boolean bWeightOut);
-//			public String NLPIR_GetFileKeyWords(String sLine, int nMaxKeyLimit, boolean bWeightOut);
-//			public int NLPIR_AddUserWord(String sWord);//add by qp 2008.11.10
-//			public int NLPIR_DelUsrWord(String sWord);//add by qp 2008.11.10
-		// 导入用户自定义词典：自定义词典路径，bOverwrite=true表示替代当前的自定义词典，false表示添加到当前自定义词典后    
-        public int NLPIR_ImportUserDict(String sFilename, boolean bOverwrite);
-		public String NLPIR_GetLastErrorMsg();
-		public void NLPIR_Exit();
-	}
+	
 
 	//将当前文件夹下的所有文件合并为一个TXT
 	@Override

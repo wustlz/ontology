@@ -72,14 +72,17 @@ public class RelationServiceImpl implements RelationService {
 						double b = (double) map_concept_sentence.get(concept).size() / sentence_size;	// 概念词共现的概率;
 						BigDecimal bd = new BigDecimal(Math.log(a_b/(a*b)));
 						double p = bd.setScale(4, BigDecimal.ROUND_HALF_UP).doubleValue();
-						if(p>0){
+//						if(p>0){
 //							System.out.println(a_b + " , " + a + " , " + b);
 //							System.out.println(listConceptFeatureIndex.size() + " , " + map_feature_sentence.get(feature).size()
 //									+ " , " + map_concept_sentence.get(concept).size());
 							conceptVector.put(i,p);
-						}
+//						}
+						conceptVector.put(i,p);
 //						if(concept.equals("系统") && i==0)
 //						System.out.println("a: " + a + " | b: " + b + " | p: " + p + " | log: " + Math.log(p));
+					} else {
+						conceptVector.put(i,0.0);
 					}
 				}
 				listComputed.add(concept);
@@ -175,7 +178,8 @@ public class RelationServiceImpl implements RelationService {
 	*/
 	private List<String> loadDomainSentence(String domainName, String typeName) throws IOException{
 		List<String> listSentence = new ArrayList<>();
-		List<File> listFiles = fileUtil.getAllFiles(ConstantValue.PREDEAL_PATH+typeName+"/"+domainName);
+//		List<File> listFiles = fileUtil.getAllFiles(ConstantValue.PREDEAL_PATH+typeName+"/"+domainName);
+		List<File> listFiles = fileUtil.getAllFiles(ConstantValue.SENTENCE_PATH+typeName+"/"+domainName);
 		InputStreamReader read = null;// 考虑到编码格式
 		BufferedReader bufferedReader = null;
 		for (File file : listFiles) {

@@ -32,7 +32,7 @@ public class ConceptAction {
 //		action.countIndexMatrix();
 		
 		// 计算概念相关度
-		action.computeRelated();
+//		action.computeRelated();
 		
 		// 通过BP神经网络训练
 //		action.trainByBP();
