@@ -137,8 +137,30 @@ public class TermService {
 	public Map<String, int[]> entropy(Map<String, Integer> atomMap, String txt) {
 		Map<String, int[]> map = new HashMap<>();
 		for(Entry<String, Integer> atom : atomMap.entrySet()) {
-			// 首先找出所有的左右邻接字
-			
+			// 首先找出所有的左右邻接字，并统计对应的词频
+			int start = 0;
+			int total_count = 0;
+			Map<String, Integer> left = new HashMap<>();
+			Map<String, Integer> right = new HashMap<>();
+			while((start=txt.indexOf(atom.getKey(), start))>=0) {
+				total_count++;
+				String tmp = "";
+				if(start>0) {
+					tmp = txt.substring(start-1, start);
+					Integer c = left.get(tmp);
+					left.put(tmp, c==null ? 1:c+1);
+				}
+				if(start+atom.getKey().length() < txt.length()) {
+					tmp = txt.substring(start+atom.getKey().length(), start+atom.getKey().length()+1);
+					Integer c = right.get(tmp);
+					right.put(tmp, c==null ? 1:c+1);
+				}
+			}
+			// 分别计算左右信息熵
+			double le = 0.0;
+			for(Entry<String, Integer> l : left.entrySet()) {
+				double p = double(l.getValue() / total_count);
+			}
 		}
 		return map;
 	}
