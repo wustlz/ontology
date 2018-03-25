@@ -12,13 +12,19 @@ import java.util.Map;
 */
 public class ConstantValue {
 
-	public static String DATA_ROOT_PATH = "D:/ontology/data/";	// 数据处理的根文件目录
+	public static String DATA_ROOT_PATH = "D:/ontology/code/data/";	// 数据处理的根文件目录
 //	public static String DATA_ROOT_PATH = "/Users/lz/desktop/ontology/data/";	// 数据处理的根文件目录
 	public static String CORPUS_PATH = DATA_ROOT_PATH + "0_corpus/";	// 原始语料库路径
 	public static String PREDEAL_PATH = DATA_ROOT_PATH + "1_predeal/1_corpus/";	// 预处理后的语料库路径
 	public static String SEGMENT_PATH = DATA_ROOT_PATH + "1_predeal/2_segment/";	// 预处理后的分词结果路径
 	public static String SENTENCE_PATH = DATA_ROOT_PATH + "1_predeal/3_sentence/";	// 预处理后的分词结果路径
 	public static String WORD_PATH = DATA_ROOT_PATH + "2_term/word/";	// 对分词结果进行停用词(性)过滤后的原子词存放路径
+		
+	public static String TERM_PATH = DATA_ROOT_PATH + "2_term/";	// 候选术语提取方法的存放根路径
+	public static String TERM_AWS_PATH = TERM_PATH + "1_AWS/";	// 原子词经过停用词及停用词性删除后得到的原子词串存放路径
+	public static String TERM_COUNT_PATH = TERM_PATH + "2_count/";	// 原子词串频率统计存放路径
+	public static String TERM_CW_PATH = TERM_PATH + "3_CW/";	// 经过原子词步长法过滤得到的候选词语
+	
 	public static String TERM_1ST_PATH = DATA_ROOT_PATH + "2_term/1st/";	// 对分词结果进行原子词步长法初步提取的术语存放路径
 	public static String TERM_2ND_PATH = DATA_ROOT_PATH + "2_term/2nd/";	// 对原子词步长法初步提取的术语进行筛选后的术语存放路径
 	public static String TERM_3RD_PATH = DATA_ROOT_PATH + "2_term/3rd/";	// 对online_info_ok进行领域归类后的术语存放路径

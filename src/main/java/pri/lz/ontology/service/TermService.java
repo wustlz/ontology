@@ -134,8 +134,8 @@ public class TermService {
 	* @param @param atomMap
 	* @param @param txt
 	*/
-	public Map<String, int[]> entropy(Map<String, Integer> atomMap, String txt) {
-		Map<String, int[]> map = new HashMap<>();
+	public Map<String, double[]> entropy(Map<String, Integer> atomMap, String txt) {
+		Map<String, double[]> map = new HashMap<>();
 		for(Entry<String, Integer> atom : atomMap.entrySet()) {
 			// 首先找出所有的左右邻接字，并统计对应的词频
 			int start = 0;
@@ -149,18 +149,34 @@ public class TermService {
 					tmp = txt.substring(start-1, start);
 					Integer c = left.get(tmp);
 					left.put(tmp, c==null ? 1:c+1);
+				} else {
+					left.put("", 1);
 				}
 				if(start+atom.getKey().length() < txt.length()) {
 					tmp = txt.substring(start+atom.getKey().length(), start+atom.getKey().length()+1);
 					Integer c = right.get(tmp);
 					right.put(tmp, c==null ? 1:c+1);
+				} else {
+					right.put("", 1);
 				}
+				start += atom.getKey().length();
 			}
+			
 			// 分别计算左右信息熵
 			double le = 0.0;
 			for(Entry<String, Integer> l : left.entrySet()) {
-				double p = double(l.getValue() / total_count);
+				double p = (double) l.getValue() / total_count;
+				le += -p*Math.log(p);
+				System.out.println(p);
 			}
+			double re = 0.0;
+			for(Entry<String, Integer> l : right.entrySet()) {
+				double p = (double) l.getValue() / total_count;
+				re += -p*Math.log(p);
+			}
+			double[] ds = {le, re};
+			map.put(atom.getKey(), ds);
+//			System.out.println(atom.getKey() + "\t" + le + "\t" + re);
 		}
 		return map;
 	}

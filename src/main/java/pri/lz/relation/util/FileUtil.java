@@ -18,7 +18,7 @@ public class FileUtil {
 
 	/**
 	 * @Title: readTxt
-	 * @Description: 全部读取当前文件
+	 * @Description: 按行读取当前文件
 	 * @param @param path
 	 * @return String
 	 * @throws IOException

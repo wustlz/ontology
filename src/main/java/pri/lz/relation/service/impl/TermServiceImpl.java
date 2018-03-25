@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -19,7 +20,9 @@ import com.alibaba.fastjson.JSONObject;
 
 import pri.lz.relation.service.TermService;
 import pri.lz.relation.util.ChineseCharUtil;
+import pri.lz.relation.util.ConstantValue;
 import pri.lz.relation.util.FileUtil;
+import pri.lz.relation.util.TermUtil;
 
 /**
 * @ClassName: TermServiceImpl
@@ -435,6 +438,262 @@ public class TermServiceImpl implements TermService {
 			}
 		} 
 	}
-	
 
+	@Override
+	public void delUnAtom(List<File> segFiles, String resultpath, HashSet<String> stopNatures,
+			HashSet<String> stopWords, int limit) throws IOException {
+		// 定义一个map集合存放原子词串，string为原子词和_组成，integer为对应的领域内的出现频率
+		Map<String, Integer> map = new HashMap<>();
+		String temp = "";
+		// 遍历所有的分词文件，进行相应的原子词删除操作
+		for (File file : segFiles) {
+			// 1、读取原子词及其词性，形如：文献	n
+			List<String> segs = fileUtil.readTxTLine(file, "UTF-8");
+			// 2、遍历分词结果，进行原子词过滤
+			for (String seg : segs) {
+				String[] words = seg.split("\t");	//words[0]=文献，words[1]=n
+				if(words.length!=2) {
+					continue;
+				}
+				if(!stopNatures.contains(words[1].trim().substring(0, 1)) && !stopWords.contains(words[0].trim())) {
+					temp += words[0].trim() + "_";
+				} else {
+					if(!temp.equals("")) {
+						if(temp.length()>2) {
+							if(map.get(temp)==null) {
+								map.put(temp, 1);
+							} else {
+								map.put(temp, map.get(temp)+1);						
+							}
+						}
+						temp = "";
+					}
+				}
+			}
+			if(!temp.equals("")) {
+				if(temp.length()>2) {
+					if(map.get(temp)==null) {
+						map.put(temp, 1);
+					} else {
+						map.put(temp, map.get(temp)+1);						
+					}
+				}
+				temp = "";
+			}
+		}
+		Map<String, Integer> fMap = new HashMap<>();
+		for(Entry<String, Integer> m : map.entrySet()) {
+			if(m.getValue()>limit) {
+				fMap.put(m.getKey(), m.getValue());
+			}
+		}
+		// 将map集合写入文件
+		fileUtil.writeTxt(fMap, resultpath, true);
+	}
+
+	@Override
+	public void countAws(Map<String, Map<String, String>> mapDomainAws, List<String> domains,  String savepath) {
+		// 定义map集合存放统计的原子词串
+		Map<String, Object> map = new HashMap<>();
+		// 根据领域名称依次遍历所有aws，进行词频统计，包括其子串
+		String temp = "";
+		for (String domain : domains) {
+			System.out.println(domain);
+			Map<String, String> mapAws = mapDomainAws.get(domain);
+			// 遍历所有原子词串
+			for (Entry<String, String> aws : mapAws.entrySet()) {				
+				// 统计子串对应词频
+				int[] count = new int[domains.size()];
+				String[] aw = aws.getKey().split("_");	//将原子词串拆分成原子词，以便构建起子串
+				for(int i=0; i<aw.length; i++) {
+					for (int j = aw.length-1; j >= i; j--) {
+						temp = aw[i];
+						for (int k = i+1; k <= j; k++) {
+							temp += aw[k];
+						}
+						if(temp.length()<2) {
+							continue;
+						}
+						if(map.get(temp)==null) {
+							count = countWord(temp, mapDomainAws, domains);
+							map.put(temp, int2String(count));
+						}
+					}
+				}
+			}
+			// 将map写入txt文件
+			fileUtil.writeMap2Txt(map, savepath+domain+".txt", true);
+		}
+	}
+	
+	private String int2String(int[] nums) {
+		String s = "";
+		for (int i : nums) {
+			s += "" + i + "\t";
+		}
+		return s;
+	}
+
+	/**
+	* @Title: countWord
+	* @Description: 统计词频
+	*/
+	private int[] countWord(String aws, Map<String, Map<String, String>> mapDomainAws, List<String> domains) {
+		int[] counts = new int[domains.size()];
+		
+		// 依照领域统计词频
+		for (int i=0; i<domains.size(); i++) {
+			Map<String, String> mapAws = mapDomainAws.get(domains.get(i));
+			int count = 0;
+			for(Entry<String, String> aw : mapAws.entrySet()) {
+				if(aw.getKey().replaceAll("_", "").indexOf(aws)>=0) {
+					count += Integer.parseInt(aw.getValue());
+				}
+			}
+			counts[i] = count;
+		}
+		return counts;
+	}
+	
+	// 获取aws的子串
+	public List<String> getSubAws(String aws){
+		List<String> list = new ArrayList<>();
+		
+		String[] aw = aws.split("_");	//将原子词串拆分成原子词，以便构建起子串
+		String temp = "";
+		for(int i=0; i<aw.length; i++) {
+			for (int j = aw.length-1; j >= i; j--) {
+				temp = aw[i];
+				for (int k = i+1; k <= j; k++) {
+					temp += aw[k];
+				}
+				if(temp.length()>1) {
+					list.add(temp);
+				}
+			}
+		}
+		
+		return list;
+	}
+
+	@Override
+	public void countTerms(Map<String, String> mapAws, List<String> listCorpus, String savepath) {
+		Map<String, Object> map = new HashMap<>();
+		// 遍历所有的原子词串，进行相关统计
+		for (Entry<String, String> aws : mapAws.entrySet()) {
+			List<String> subAws = getSubAws(aws.getKey());
+			for(String aw : subAws) {
+				//统计词频及左右邻接字
+				int[] wf = new int[listCorpus.size()];
+				Map<String, Integer> leftWord = new HashMap<>();
+				Map<String, Integer> rightWord = new HashMap<>();
+				for(int i=0; i<listCorpus.size(); i++) {
+					int start = 0;
+					int count = 0;
+					while((start=listCorpus.get(i).indexOf(aw, start))>=0) {
+						count++;
+						if(start>0) {	//统计左邻接字
+							String ltmp = listCorpus.get(i).substring(start-1, start);
+							Integer c = leftWord.get(ltmp);
+							leftWord.put(ltmp, c==null?1:c+1);
+						} else {
+							leftWord.put("", 1);
+						}
+						if((start+aw.length())<listCorpus.get(i).length()) {	//统计右邻接字
+							String rtmp = listCorpus.get(i).substring(start+aw.length(), start+aw.length()+1);
+							Integer c = leftWord.get(rtmp);
+							rightWord.put(rtmp, c==null?1:c+1);
+						} else {
+							rightWord.put("", 1);
+						}
+						start += aw.length();
+					}
+					wf[i] = count;
+				}
+				// 统计总词频
+				int sum = 0;
+				for (int i : wf) {
+					sum += i;
+				}
+				// 计算左右信息熵
+				double le = computEntropy(leftWord, sum);
+				double re = computEntropy(rightWord, sum);
+				String v = "" + sum + "\t" + le + "\t" + re;
+				for(int i : wf) {
+					v += "\t" + i;
+				}
+				map.put(aw, v);
+			}
+		}
+		// 写入txt
+		fileUtil.writeMap2Txt(map, savepath, true);
+	}
+	
+	public double computEntropy(Map<String, Integer> word, int total_count) {
+		double lre = 0.0;
+		for(Entry<String, Integer> lr : word.entrySet()) {
+			double p = (double) lr.getValue() / total_count;
+			lre += -p*Math.log(p);
+		}
+		return lre;
+	}
+
+	@Override
+	public void filterAws(int limit) throws IOException {
+		// 读取统计好的词频文件
+		TermUtil termUtil = new TermUtil();
+		List<String> domains = termUtil.getDomains();
+		DecimalFormat decimalFormat = new DecimalFormat();
+		decimalFormat.applyPattern("#.0000");	//四位小数
+		
+		// 对每个领域的词频文件分开统计
+		for (String domain : domains) {
+			System.out.println(domain);
+			List<String> list = fileUtil.readTxt(ConstantValue.TERM_COUNT_PATH+domain+".txt", "UTF-8");
+			Map<String, Object> map = new HashMap<>();
+			for (String aws : list) {
+				String[] aw = aws.split("\t");
+				int total = Integer.parseInt(aw[1]);
+				if(aw.length<5 || aw[0].length()<2 || total<limit || !ChineseCharUtil.isChinese(aw[0])) {
+					continue;
+				}
+				//统计次数
+				int n = 0;	//含有w的文档数
+				int m = 0;	//总文档数
+				double[] tf = new double[aw.length-3];	//统计含有w的文档的词频
+				int idx = 0;
+				int a = 0;	//临时
+				for(int i=4; i<aw.length; i++) {
+					m++;
+					a = Integer.parseInt(aw[i]);
+					if(a>0) {
+						n++;
+						tf[idx++] = a;
+					}
+				}
+				tf[idx] = (double) total/m;
+				// 计算信息熵
+				double le = Double.parseDouble(aw[2]);
+				double re = Double.parseDouble(aw[3]);
+				double entropy = le*re;
+				// 计算平均词频
+				double tfa = (double) (m+1)*total/m/(n+1);
+				// 计算加权平均词频
+				double sum = 0.0;
+				for (int i=0; i<=idx; i++) {
+					sum += Math.pow(tf[i]-tfa, 2);
+				}
+				sum = Math.pow(sum/n, 0.5);
+				// 计算信息熵*平均词频
+				double rst = entropy * sum;
+				String v = aw[1] + "\t" + decimalFormat.format(rst) + "\t" + decimalFormat.format(entropy)
+						+ "\t" + decimalFormat.format(sum) + "\t" + decimalFormat.format(le)
+						+ "\t" + decimalFormat.format(re);
+				map.put(aw[0], v);
+			}
+			fileUtil.writeMap2Txt(map, ConstantValue.TERM_CW_PATH+domain+".txt", true);
+		}
+				
+		
+	}
 }

@@ -11,7 +11,7 @@ import pri.lz.relation.util.FileUtil;
 
 /**
 * @ClassName: PreDealAction
-* @Description: 系统第1步，完成对语料库的预处理，最终得到原子词集合，主要过程如下：
+* @Description: 系统第1步，完成对语料库的预处理（0_corpus），最终得到原子词集合，主要过程如下：
 * 				1）原始语料pre_corpus的文件编码转换，全角-半角转换，得到预处理后的语料1_predeal/1_corpus；
 * 				2）通过中科院分词工具NLPIR对corpus分词处理，得到原子词集合1_predeal/2_segment；
 * 				3）对corpus进行切分成句处理，得到句子集合1_predeal/3_sentence；
@@ -32,22 +32,22 @@ public class PreDealAction {
 		long startTime = System.currentTimeMillis();
 		
 		//1、预处理语料数据
-//		main.preDealCorpus(ConstantValue.CORPUS_PATH, ConstantValue.PREDEAL_PATH);
+		main.preDealCorpus(ConstantValue.CORPUS_PATH, ConstantValue.PREDEAL_PATH);
 		
 		//2、对预处理的语料通过ICTCLAS进行分词，得到原子词集合
 		main.segment(ConstantValue.PREDEAL_PATH, ConstantValue.SEGMENT_PATH, ConstantValue.NLPIR);
 		
 		//3、将预处理后的语料进行分句
-//		main.getSentence(ConstantValue.PREDEAL_PATH);
+		main.getSentence(ConstantValue.PREDEAL_PATH);
 		
 		//4、按照领域将文章整合到1个TXT文件
-//		main.mergePaper();
+		main.mergePaper();
 		
 		long endTime = System.currentTimeMillis();
 		System.out.println("over, Time: " + (endTime-startTime) + "ms");
 
 	}
-	
+
 	/**
 	* @Title: mergePaper
 	* @Description: 按照领域将文章整合到1个TXT文件
@@ -119,12 +119,15 @@ public class PreDealAction {
 			//2、遍历所有文件夹，进行预处理
 			for (File fileDir : listFileDirs) {
 				List<File> listFiles = fileUtil.getAllFiles(fileDir.getPath());
+				long l = 0;
 				for (File file : listFiles) {
+					l += file.length();
 					//2.1、以GBK编码读取当前文件内容
 					String txt = fileUtil.readTxt(file,"GBK");
 					//2.2、按照预处理规则进行预处理转换，全角改半角，编码改UTF-8，并重新写入txt文件
 					preDealService.writeTxtUTF8(txt, predealDir+dir+"/"+fileDir.getName()+"/", file.getName(), false);
 				}
+				System.out.println(dir+"\t"+fileDir.getName()+"\t"+listFiles.size()+"\t"+l);
 			}
 		}
 	}
