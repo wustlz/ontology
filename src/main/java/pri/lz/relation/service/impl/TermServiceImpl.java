@@ -1,7 +1,9 @@
 package pri.lz.relation.service.impl;
 
+import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -455,11 +457,12 @@ public class TermServiceImpl implements TermService {
 				if(words.length!=2) {
 					continue;
 				}
-				if(!stopNatures.contains(words[1].trim().substring(0, 1)) && !stopWords.contains(words[0].trim())) {
-					temp += words[0].trim() + "_";
+				if(!stopNatures.contains(words[1].trim().substring(0, 1)) && !stopWords.contains(words[0].trim())
+						&& ChineseCharUtil.isChinese(words[0].trim())) {
+					temp += words[0].trim() + "/" + words[1].trim() + "_";
 				} else {
 					if(!temp.equals("")) {
-						if(temp.length()>2) {
+						if(temp.split("/")[0].length()>1) {
 							if(map.get(temp)==null) {
 								map.put(temp, 1);
 							} else {
@@ -556,19 +559,41 @@ public class TermServiceImpl implements TermService {
 	}
 	
 	// 获取aws的子串
-	public List<String> getSubAws(String aws){
-		List<String> list = new ArrayList<>();
+	public List<String[]> getSubAws(String aws, HashSet<String> stopNatures, HashSet<String> stopWords){
+		List<String[]> list = new ArrayList<>();
 		
 		String[] aw = aws.split("_");	//将原子词串拆分成原子词，以便构建起子串
 		String temp = "";
+		String tmpn = "";
+		String nature = "";
 		for(int i=0; i<aw.length; i++) {
 			for (int j = aw.length-1; j >= i; j--) {
-				temp = aw[i];
+				int count_ = 1;
+				tmpn = aw[i];
+				String[] atmp = aw[i].split("/");
+				if(atmp.length!=2) {
+					System.out.println(aw[i]);
+					continue;
+				}
+				temp = atmp[0];
+				nature = atmp[1];
 				for (int k = i+1; k <= j; k++) {
-					temp += aw[k];
+					tmpn += "_"+aw[k];
+					temp += aw[k].split("/")[0];
+					count_++;
 				}
 				if(temp.length()>1) {
-					list.add(temp);
+//					if(temp.equals("做到")) {
+//						System.out.println(tmpn + stopNatures.contains(nature) + stopWords.contains(temp) + count_);
+//					}
+					if(count_==1 && stopNatures.contains(nature)) {	//单个原子词串的词性不符合要求
+						continue;
+					} else if(count_==1 && stopWords.contains(temp)){	//单个原子词串是停用词v2
+						continue;
+					} else {
+						String[] t = {temp,tmpn};
+						list.add(t);
+					}
 				}
 			}
 		}
@@ -577,12 +602,23 @@ public class TermServiceImpl implements TermService {
 	}
 
 	@Override
-	public void countTerms(Map<String, String> mapAws, List<String> listCorpus, String savepath) {
+	public void countTerms(Map<String, String> mapAws, List<String> listCorpus, List<String> listCounted, HashSet<String> stopNatures, HashSet<String> stopWords, String savepath) {
 		Map<String, Object> map = new HashMap<>();
+		Map<String, Object> mapExist = new HashMap<>();
 		// 遍历所有的原子词串，进行相关统计
 		for (Entry<String, String> aws : mapAws.entrySet()) {
-			List<String> subAws = getSubAws(aws.getKey());
-			for(String aw : subAws) {
+			List<String[]> subAws = getSubAws(aws.getKey(), stopNatures, stopWords);
+			for(String[] aw : subAws) {
+				if(mapExist.get(aw[0])!=null) {
+					continue;
+				}
+				// 检测是否已经统计过
+				String v = checkCounted(aw[0], listCounted);
+				if (!v.equals("no")) {
+					map.put(aw[1], v);
+					mapExist.put(aw[0], "");
+					continue;
+				}
 				//统计词频及左右邻接字
 				int[] wf = new int[listCorpus.size()];
 				Map<String, Integer> leftWord = new HashMap<>();
@@ -590,7 +626,7 @@ public class TermServiceImpl implements TermService {
 				for(int i=0; i<listCorpus.size(); i++) {
 					int start = 0;
 					int count = 0;
-					while((start=listCorpus.get(i).indexOf(aw, start))>=0) {
+					while((start=listCorpus.get(i).indexOf(aw[0], start))>=0) {
 						count++;
 						if(start>0) {	//统计左邻接字
 							String ltmp = listCorpus.get(i).substring(start-1, start);
@@ -599,14 +635,14 @@ public class TermServiceImpl implements TermService {
 						} else {
 							leftWord.put("", 1);
 						}
-						if((start+aw.length())<listCorpus.get(i).length()) {	//统计右邻接字
-							String rtmp = listCorpus.get(i).substring(start+aw.length(), start+aw.length()+1);
+						if((start+aw[0].length())<listCorpus.get(i).length()) {	//统计右邻接字
+							String rtmp = listCorpus.get(i).substring(start+aw[0].length(), start+aw[0].length()+1);
 							Integer c = leftWord.get(rtmp);
 							rightWord.put(rtmp, c==null?1:c+1);
 						} else {
 							rightWord.put("", 1);
 						}
-						start += aw.length();
+						start += aw[0].length();
 					}
 					wf[i] = count;
 				}
@@ -618,11 +654,16 @@ public class TermServiceImpl implements TermService {
 				// 计算左右信息熵
 				double le = computEntropy(leftWord, sum);
 				double re = computEntropy(rightWord, sum);
-				String v = "" + sum + "\t" + le + "\t" + re;
+				v = "" + sum + "\t" + le + "\t" + re;
 				for(int i : wf) {
 					v += "\t" + i;
 				}
-				map.put(aw, v);
+				map.put(aw[1], v);
+				mapExist.put(aw[0], "");
+				if(map.size()>1000) {
+					fileUtil.writeMap2Txt(map, savepath, true);
+					map.clear();
+				}
 			}
 		}
 		// 写入txt
@@ -637,6 +678,23 @@ public class TermServiceImpl implements TermService {
 		}
 		return lre;
 	}
+	
+	public String checkCounted(String aw, List<String> listCounted) {
+		String rst = "no";
+		
+		for(String doneAw : listCounted) {
+			String[] aws = doneAw.split("\t");
+			if(aw.equals(aws[0])) {
+				rst = aws[1];
+				for(int i=2; i<aws.length; i++) {
+					rst += "\t" + aws[i];
+				}
+				break;
+			}
+		}
+		
+		return rst;
+	}
 
 	@Override
 	public void filterAws(int limit) throws IOException {
@@ -649,51 +707,116 @@ public class TermServiceImpl implements TermService {
 		// 对每个领域的词频文件分开统计
 		for (String domain : domains) {
 			System.out.println(domain);
-			List<String> list = fileUtil.readTxt(ConstantValue.TERM_COUNT_PATH+domain+".txt", "UTF-8");
+			// 考虑到部分文件过大，需要更换读取方式
+			File file = new File(ConstantValue.TERM_COUNT_PATH+domain+".txt");
+			List<String> list = new ArrayList<>();
 			Map<String, Object> map = new HashMap<>();
-			for (String aws : list) {
-				String[] aw = aws.split("\t");
-				int total = Integer.parseInt(aw[1]);
-				if(aw.length<5 || aw[0].length()<2 || total<limit || !ChineseCharUtil.isChinese(aw[0])) {
-					continue;
-				}
-				//统计次数
-				int n = 0;	//含有w的文档数
-				int m = 0;	//总文档数
-				double[] tf = new double[aw.length-3];	//统计含有w的文档的词频
-				int idx = 0;
-				int a = 0;	//临时
-				for(int i=4; i<aw.length; i++) {
-					m++;
-					a = Integer.parseInt(aw[i]);
-					if(a>0) {
-						n++;
-						tf[idx++] = a;
+			if(!file.exists()) {
+				continue;
+			} else if (file.length()<1024*1024*20) {
+				list = fileUtil.readTxTLine(file, "UTF-8");
+				for (String aws : list) {
+					String[] aw = aws.split("\t");
+					String v = computeCW(aw, limit, decimalFormat);
+					if(v!=null) {
+						map.put(aw[0], v);
 					}
 				}
-				tf[idx] = (double) total/m;
-				// 计算信息熵
-				double le = Double.parseDouble(aw[2]);
-				double re = Double.parseDouble(aw[3]);
-				double entropy = le*re;
-				// 计算平均词频
-				double tfa = (double) (m+1)*total/m/(n+1);
-				// 计算加权平均词频
-				double sum = 0.0;
-				for (int i=0; i<=idx; i++) {
-					sum += Math.pow(tf[i]-tfa, 2);
+			} else {
+				BufferedInputStream fis = new BufferedInputStream(new FileInputStream(file));    
+				BufferedReader reader = new BufferedReader(new InputStreamReader(fis,"utf-8"), 10*1024*1024);// 用5M的缓冲读取文本文件  
+				  
+				String aws = "";
+				while((aws = reader.readLine()) != null){
+					String[] aw = aws.split("\t");
+					String v = computeCW(aw, limit, decimalFormat);
+					if(v!=null) {
+						map.put(aw[0], v);
+					}
 				}
-				sum = Math.pow(sum/n, 0.5);
-				// 计算信息熵*平均词频
-				double rst = entropy * sum;
-				String v = aw[1] + "\t" + decimalFormat.format(rst) + "\t" + decimalFormat.format(entropy)
-						+ "\t" + decimalFormat.format(sum) + "\t" + decimalFormat.format(le)
-						+ "\t" + decimalFormat.format(re);
-				map.put(aw[0], v);
+				reader.close();
 			}
 			fileUtil.writeMap2Txt(map, ConstantValue.TERM_CW_PATH+domain+".txt", true);
 		}
-				
+	}
+	
+	public String computeCW(String[] aw,int limit, DecimalFormat decimalFormat) {
+		int total = Integer.parseInt(aw[1]);
+		if(aw.length<5 || aw[0].length()<2 || total<limit) {
+			return null;
+		}
+		//统计次数
+		int n = 0;	//含有w的文档数
+		int m = 0;	//总文档数
+		double[] tf = new double[aw.length-3];	//统计含有w的文档的词频
+		int idx = 0;
+		int a = 0;	//临时
+		for(int i=4; i<aw.length; i++) {
+			m++;
+			a = Integer.parseInt(aw[i]);
+			if(a>0) {
+				n++;
+				tf[idx++] = a;
+			}
+		}
+		tf[idx] = (double) total/m;
+		// 计算信息熵
+		double le = Double.parseDouble(aw[2]);
+		double re = Double.parseDouble(aw[3]);
+		double entropy = le*re;
+		// 计算平均词频
+		double tfa = (double) (m+1)*total/m/(n+1);
+		// 计算加权平均词频
+		double sum = 0.0;
+		for (int i=0; i<=idx; i++) {
+			sum += Math.pow(tf[i]-tfa, 2);
+		}
+		sum = Math.pow(sum/n, 0.5);
+		// 计算信息熵*平均词频
+		double rst = entropy * sum;
+		String v = aw[1] + "\t" + decimalFormat.format(rst) + "\t" + decimalFormat.format(entropy)
+				+ "\t" + decimalFormat.format(sum) + "\t" + decimalFormat.format(le)
+				+ "\t" + decimalFormat.format(re);
 		
+		return v;
+	}
+
+	@Override
+	public void filterCW(String domain, int limitFrequency, double limitEntropy,
+			HashSet<String> stopNatures, HashSet<String> stopWords) throws IOException {
+		List<String> listAws = fileUtil.readTxt(ConstantValue.TERM_CW_PATH+domain+".txt", "UTF-8");
+		Map<String, Object> map = new HashMap<>();
+		for (String aws : listAws) {
+			String[] aw = aws.split("\t");
+			if(aw.length==7) {
+				String[] tmp = aw[0].trim().split("_");
+				// 首先再次根据停用词及停用词性筛选，由于数量较小，效率在可接受范围
+				if(tmp.length==1) {
+					String[] t = tmp[0].split("/");
+					if(stopWords.contains(t[0].trim()) || stopNatures.contains(t[1])) {
+						continue;
+					}
+				} else {
+					String s = "";
+					for(int i=0; i<tmp.length; i++) {
+						String[] t = tmp[0].split("/");
+						s += t[0];
+					}
+					if(stopWords.contains(s)) {
+						continue;
+					}
+				}
+				// 根据词频和信息熵过滤
+				if(Integer.parseInt(aw[1]) < limitFrequency) {
+					continue;
+				}
+				if(Double.parseDouble(aw[3]) < limitEntropy) {
+					continue;
+				}
+				String v = aw[1] + "\t" + aw[2] + "\t" + aw[3] + "\t" + aw[4] + "\t" + aw[5] + "\t" + aw[6];
+				map.put(aw[0], v);
+			}
+		}
+		fileUtil.writeMap2Txt(map, ConstantValue.TERM_TERM_PATH+domain+".txt", false);
 	}
 }

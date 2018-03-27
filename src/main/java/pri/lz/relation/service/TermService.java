@@ -86,12 +86,16 @@ public interface TermService {
 	/**
 	* @Title: countTerms
 	* @Description: 对原子词串及其子串进行各领域文档词频、左右信息熵统计
-	* @param @param mapAws
-	* @param @param listCorpus
+	* @param @param mapAws-待统计的原子词串
+	* @param @param listCorpus-领域语料
+	* @param @param listCounted-已计算过的原子词串，避免重复计算，影响效率
+	* @param @param stopNatures- 针对单原子词的停用词性
+	* @param @param HashSet<String> stopWords- 针对单原子词的停用词
 	* @param @param string
-	* @return void
 	*/
-	public void countTerms(Map<String, String> mapAws, List<String> listCorpus, String savepath);
+	public void countTerms(Map<String, String> mapAws, List<String> listCorpus, List<String> listCounted, HashSet<String> stopNatures, HashSet<String> stopWords, String savepath);
 
 	public void filterAws(int limit) throws IOException;
+
+	public void filterCW(String domain, int limitFrequency, double limitEntropy, HashSet<String> stopNatures, HashSet<String> stopWords)  throws IOException;
 }

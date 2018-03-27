@@ -24,6 +24,7 @@ public class ConstantValue {
 	public static String TERM_AWS_PATH = TERM_PATH + "1_AWS/";	// 原子词经过停用词及停用词性删除后得到的原子词串存放路径
 	public static String TERM_COUNT_PATH = TERM_PATH + "2_count/";	// 原子词串频率统计存放路径
 	public static String TERM_CW_PATH = TERM_PATH + "3_CW/";	// 经过原子词步长法过滤得到的候选词语
+	public static String TERM_TERM_PATH = TERM_PATH + "5_term/";	// 经过信息熵过滤得到的候选术语
 	
 	public static String TERM_1ST_PATH = DATA_ROOT_PATH + "2_term/1st/";	// 对分词结果进行原子词步长法初步提取的术语存放路径
 	public static String TERM_2ND_PATH = DATA_ROOT_PATH + "2_term/2nd/";	// 对原子词步长法初步提取的术语进行筛选后的术语存放路径

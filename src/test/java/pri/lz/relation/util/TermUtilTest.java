@@ -32,7 +32,7 @@ public class TermUtilTest {
 			Map<String, String> mapAws = new HashMap<>();
 			mapAws.put("无产阶级_革命_运动_", "8");
 			System.out.println(domain + " , " + listCorpus.size() + " , " + mapAws.size());
-			termService.countTerms(mapAws, listCorpus, ConstantValue.TERM_COUNT_PATH+domain+".txt");
+			termService.countTerms(mapAws, listCorpus, null, null, null, ConstantValue.TERM_COUNT_PATH+domain+".txt");
 			break;
 		}
 	}

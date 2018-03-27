@@ -13,7 +13,7 @@ import pri.lz.relation.util.FileUtil;
 
 /**
 * @ClassName: ConceptAction
-* @Description: 通过神经网络训练分类模型
+* @Description: 系统第3步，完成对候选术语的处理，最终得到候选概念集合，主要过程如下：
 * @author 廖劲为
 * @date 2017年4月12日 下午3:28:16
 * 

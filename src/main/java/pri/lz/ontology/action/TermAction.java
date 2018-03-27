@@ -23,7 +23,7 @@ public class TermAction {
 	*/
 	private void test() throws IOException {
 //		String txt = StaticValue.test_txt;
-		String txt = "毛泽东内心世界根深蒂固";
+		String txt = "@①原字艹下加秋@②原字木加巳@③原字叹繁体@④原字穴下加洼";
 		String segStr = termService.segmentSingle(txt);
 		System.out.println(segStr);
 		List<String> natureList = termService.delWordByNature(segStr);
